@@ -60,6 +60,11 @@
         <img src=".github/assets/screenshots/recognition.png">
       </td>
     </tr>
+    <tr>
+      <td style="text-align: center">
+        <img src=".github/assets/screenshots/correction.png">
+      </td>
+    </tr>
   </tbody>
 </table>
 
