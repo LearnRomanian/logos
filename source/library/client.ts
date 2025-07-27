@@ -10,7 +10,6 @@ import { DatabaseStore } from "logos/stores/database";
 import { EventStore } from "logos/stores/events";
 import { GuildStore } from "logos/stores/guilds";
 import { InteractionStore } from "logos/stores/interactions";
-import { JournallingStore } from "logos/stores/journalling";
 import { LocalisationStore, type RawLocalisations } from "logos/stores/localisations";
 import { PluginStore } from "logos/stores/plugins";
 import { ServiceStore } from "logos/stores/services";
@@ -30,7 +29,6 @@ class Client {
 	readonly volatile?: VolatileStore;
 	readonly services: ServiceStore;
 	readonly #events: EventStore;
-	readonly #journalling: JournallingStore;
 	readonly #guilds: GuildStore;
 	readonly adapters: AdapterStore;
 	readonly #plugins: PluginStore;
@@ -173,10 +171,6 @@ class Client {
 		return this.#cache.documents;
 	}
 
-	get tryLog(): JournallingStore["tryLog"] {
-		return this.#journalling.tryLog.bind(this.#journalling);
-	}
-
 	get registerInteractionCollector(): <Metadata extends string[]>(
 		collector: InteractionCollector<Metadata>,
 	) => Promise<void> {
@@ -207,7 +201,6 @@ class Client {
 		this.volatile = VolatileStore.tryCreate(this);
 		this.services = new ServiceStore(this);
 		this.#events = new EventStore(this);
-		this.#journalling = new JournallingStore(this);
 		this.#guilds = new GuildStore(this, { services: this.services, commands: this.#commands });
 		this.adapters = new AdapterStore(this);
 		this.#plugins = new PluginStore(this);
@@ -253,7 +246,6 @@ class Client {
 		await this.volatile?.setup();
 		await this.database.setup({ prefetchDocuments: true });
 		await this.services.setup();
-		await this.#journalling.setup();
 		await this.#guilds.setup();
 		await this.interactions.setup();
 		await this.#setupCollectors();
@@ -281,7 +273,6 @@ class Client {
 		this.volatile?.teardown();
 		await this.database.teardown();
 		await this.services.teardown();
-		this.#journalling.teardown();
 		await this.#guilds.teardown();
 		await this.interactions.teardown();
 		this.#teardownCollectors();

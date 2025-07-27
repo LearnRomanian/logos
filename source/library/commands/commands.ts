@@ -8,7 +8,6 @@ import { handleDisplayCredits } from "logos/commands/handlers/credits";
 import { handleStartGame } from "logos/commands/handlers/game";
 import type { InteractionHandler } from "logos/commands/handlers/handler";
 import { handleDisplayBotInformation } from "logos/commands/handlers/information/bot";
-import { handleDisplayGuildInformation } from "logos/commands/handlers/information/guild";
 import {
 	handleDisplayDetectorLicence,
 	handleDisplayDetectorLicenceAutocomplete,
@@ -18,61 +17,19 @@ import {
 	handleDisplayDictionaryLicenceAutocomplete,
 } from "logos/commands/handlers/licence/dictionary";
 import {
-	handleDisplaySoftwareLicence,
-	handleDisplaySoftwareLicenceAutocomplete,
-} from "logos/commands/handlers/licence/software";
-import {
 	handleDisplayTranslatorLicence,
 	handleDisplayTranslatorLicenceAutocomplete,
 } from "logos/commands/handlers/licence/translator";
-import {
-	handleDisplayAuthorPraises,
-	handleDisplayPraisesAutocomplete,
-	handleDisplayTargetPraises,
-} from "logos/commands/handlers/list/praises";
-import { handleDisplayWarnings, handleDisplayWarningsAutocomplete } from "logos/commands/handlers/list/warnings";
-import { handleFastForward, handleFastForwardAutocomplete } from "logos/commands/handlers/music/fast-forward";
-import { handleDisplayPlaybackHistory } from "logos/commands/handlers/music/history";
-import { handleLoopPlayback } from "logos/commands/handlers/music/loop";
-import { handleDisplayCurrentlyPlaying } from "logos/commands/handlers/music/now";
-import { handlePausePlayback } from "logos/commands/handlers/music/pause";
-import { handleRequestStreamPlayback, handleRequestYouTubePlayback } from "logos/commands/handlers/music/play";
-import { handleDisplayPlaybackQueue } from "logos/commands/handlers/music/queue";
-import { handleRemoveSongListing } from "logos/commands/handlers/music/remove";
-import { handleReplayAction } from "logos/commands/handlers/music/replay";
-import { handleResumePlayback } from "logos/commands/handlers/music/resume";
-import { handleRewind, handleRewindAutocomplete } from "logos/commands/handlers/music/rewind";
-import { handleSkipAction } from "logos/commands/handlers/music/skip";
-import { handleSkipToTimestamp, handleSkipToTimestampAutocomplete } from "logos/commands/handlers/music/skip-to";
-import { handleStopPlayback } from "logos/commands/handlers/music/stop";
-import { handleUnskipAction } from "logos/commands/handlers/music/unskip";
-import { handleDisplayVolume } from "logos/commands/handlers/music/volume/display";
-import { handleSetVolume } from "logos/commands/handlers/music/volume/set";
-import { handlePardonUser, handlePardonUserAutocomplete } from "logos/commands/handlers/pardon";
-import { handleDisplayModerationPolicy } from "logos/commands/handlers/policy";
-import { handlePraiseUser, handlePraiseUserAutocomplete } from "logos/commands/handlers/praise";
-import { handleOpenRoleSelectionMenu } from "logos/commands/handlers/profile/roles";
-import { handleDisplayProfile, handleDisplayProfileAutocomplete } from "logos/commands/handlers/profile/view";
-import { handlePurgeMessages, handlePurgeMessagesAutocomplete } from "logos/commands/handlers/purge";
 import { handleRecogniseLanguageChatInput, handleRecogniseLanguageMessage } from "logos/commands/handlers/recognise";
-import { handleMakeReport } from "logos/commands/handlers/report";
-import { handleSubmitResource } from "logos/commands/handlers/resource";
 import { handleDisplayResources } from "logos/commands/handlers/resources";
-import { handleCiteRule, handleCiteRuleAutocomplete } from "logos/commands/handlers/rule";
 import { handleClearLanguage } from "logos/commands/handlers/settings/language/clear";
 import { handleSetLanguage, handleSetLanguageAutocomplete } from "logos/commands/handlers/settings/language/set";
 import { handleDisplaySettings } from "logos/commands/handlers/settings/view";
-import { handleToggleSlowmode, handleToggleSlowmodeAutocomplete } from "logos/commands/handlers/slowmode";
-import { handleMakeSuggestion } from "logos/commands/handlers/suggestion";
-import { handleOpenTicket } from "logos/commands/handlers/ticket/open";
-import { handleClearTimeout, handleClearTimeoutAutocomplete } from "logos/commands/handlers/timeout/clear";
-import { handleSetTimeout, handleSetTimeoutAutocomplete } from "logos/commands/handlers/timeout/set";
 import {
 	handleTranslateChatInput,
 	handleTranslateChatInputAutocomplete,
 	handleTranslateMessage,
 } from "logos/commands/handlers/translate";
-import { handleWarnUser, handleWarnUserAutocomplete } from "logos/commands/handlers/warn";
 import { handleFindWord, handleFindWordAutocomplete } from "logos/commands/handlers/word";
 
 /**
@@ -91,47 +48,6 @@ const commands = Object.freeze({
 				handle: handleDisplayBotInformation,
 				options: { show: constants.parameters.show },
 				flags: { isShowable: true },
-			},
-			server: {
-				identifier: "server",
-				type: Discord.ApplicationCommandOptionTypes.SubCommand,
-				handle: handleDisplayGuildInformation,
-				options: { show: constants.parameters.show },
-				flags: { isShowable: true },
-			},
-		},
-	},
-	list: {
-		identifier: "list",
-		type: Discord.ApplicationCommandTypes.ChatInput,
-		defaultMemberPermissions: ["VIEW_CHANNEL"],
-		options: {
-			praises: {
-				identifier: "praises",
-				type: Discord.ApplicationCommandOptionTypes.SubCommandGroup,
-				options: {
-					author: {
-						identifier: "author",
-						type: Discord.ApplicationCommandOptionTypes.SubCommand,
-						handle: handleDisplayAuthorPraises,
-						handleAutocomplete: handleDisplayPraisesAutocomplete,
-						options: { user: { ...constants.parameters.user, required: false } },
-					},
-					target: {
-						identifier: "target",
-						type: Discord.ApplicationCommandOptionTypes.SubCommand,
-						handle: handleDisplayTargetPraises,
-						handleAutocomplete: handleDisplayPraisesAutocomplete,
-						options: { user: { ...constants.parameters.user, required: false } },
-					},
-				},
-			},
-			warnings: {
-				identifier: "warnings",
-				type: Discord.ApplicationCommandOptionTypes.SubCommand,
-				handle: handleDisplayWarnings,
-				handleAutocomplete: handleDisplayWarningsAutocomplete,
-				options: { user: { ...constants.parameters.user, required: false } },
 			},
 		},
 	},
@@ -327,20 +243,6 @@ const commands = Object.freeze({
 					},
 				},
 			},
-			software: {
-				identifier: "software",
-				type: Discord.ApplicationCommandOptionTypes.SubCommand,
-				handle: handleDisplaySoftwareLicence,
-				handleAutocomplete: handleDisplaySoftwareLicenceAutocomplete,
-				options: {
-					package: {
-						identifier: "package",
-						type: Discord.ApplicationCommandOptionTypes.String,
-						required: true,
-						autocomplete: true,
-					},
-				},
-			},
 			translator: {
 				identifier: "translator",
 				type: Discord.ApplicationCommandOptionTypes.SubCommand,
@@ -391,337 +293,6 @@ const commands = Object.freeze({
 				identifier: "view",
 				type: Discord.ApplicationCommandOptionTypes.SubCommand,
 				handle: handleDisplaySettings,
-			},
-		},
-	},
-	pardon: {
-		identifier: "pardon",
-		type: Discord.ApplicationCommandTypes.ChatInput,
-		defaultMemberPermissions: ["MODERATE_MEMBERS"],
-		handle: handlePardonUser,
-		handleAutocomplete: handlePardonUserAutocomplete,
-		options: {
-			user: constants.parameters.user,
-			warning: {
-				identifier: "warning",
-				type: Discord.ApplicationCommandOptionTypes.String,
-				required: true,
-				autocomplete: true,
-			},
-		},
-	},
-	policy: {
-		identifier: "policy",
-		type: Discord.ApplicationCommandTypes.ChatInput,
-		defaultMemberPermissions: ["VIEW_CHANNEL"],
-		handle: handleDisplayModerationPolicy,
-		options: { show: constants.parameters.show },
-		flags: { isShowable: true },
-	},
-	purge: {
-		identifier: "purge",
-		type: Discord.ApplicationCommandTypes.ChatInput,
-		defaultMemberPermissions: ["MODERATE_MEMBERS"],
-		handle: handlePurgeMessages,
-		handleAutocomplete: handlePurgeMessagesAutocomplete,
-		options: {
-			start: {
-				identifier: "start",
-				type: Discord.ApplicationCommandOptionTypes.String,
-				required: true,
-			},
-			end: {
-				identifier: "end",
-				type: Discord.ApplicationCommandOptionTypes.String,
-			},
-			author: { ...constants.parameters.user, identifier: "author", required: false },
-		},
-	},
-	report: {
-		identifier: "report",
-		type: Discord.ApplicationCommandTypes.ChatInput,
-		defaultMemberPermissions: ["VIEW_CHANNEL"],
-		handle: handleMakeReport,
-	},
-	rule: {
-		identifier: "rule",
-		type: Discord.ApplicationCommandTypes.ChatInput,
-		defaultMemberPermissions: ["VIEW_CHANNEL"],
-		handle: handleCiteRule,
-		handleAutocomplete: handleCiteRuleAutocomplete,
-		options: {
-			rule: {
-				identifier: "rule",
-				type: Discord.ApplicationCommandOptionTypes.String,
-				required: true,
-				autocomplete: true,
-			},
-			show: constants.parameters.show,
-		},
-		flags: { isShowable: true },
-	},
-	slowmode: {
-		identifier: "slowmode",
-		type: Discord.ApplicationCommandTypes.ChatInput,
-		defaultMemberPermissions: ["MODERATE_MEMBERS"],
-		handle: handleToggleSlowmode,
-		handleAutocomplete: handleToggleSlowmodeAutocomplete,
-		options: {
-			level: {
-				identifier: "level",
-				type: Discord.ApplicationCommandOptionTypes.String,
-				autocomplete: true,
-			},
-		},
-	},
-	timeout: {
-		identifier: "timeout",
-		type: Discord.ApplicationCommandTypes.ChatInput,
-		defaultMemberPermissions: ["MODERATE_MEMBERS"],
-		options: {
-			set: {
-				identifier: "set",
-				type: Discord.ApplicationCommandOptionTypes.SubCommand,
-				handle: handleSetTimeout,
-				handleAutocomplete: handleSetTimeoutAutocomplete,
-				options: {
-					user: constants.parameters.user,
-					duration: constants.parameters.duration,
-					reason: constants.parameters.reason,
-				},
-			},
-			clear: {
-				identifier: "clear",
-				type: Discord.ApplicationCommandOptionTypes.SubCommand,
-				handle: handleClearTimeout,
-				handleAutocomplete: handleClearTimeoutAutocomplete,
-				options: { user: constants.parameters.user },
-			},
-		},
-	},
-	warn: {
-		identifier: "warn",
-		type: Discord.ApplicationCommandTypes.ChatInput,
-		defaultMemberPermissions: ["MODERATE_MEMBERS"],
-		handle: handleWarnUser,
-		handleAutocomplete: handleWarnUserAutocomplete,
-		options: {
-			user: constants.parameters.user,
-			rule: {
-				identifier: "rule",
-				type: Discord.ApplicationCommandOptionTypes.String,
-				required: true,
-				autocomplete: true,
-			},
-			reason: constants.parameters.reason,
-		},
-	},
-	//Server
-	resource: {
-		identifier: "resource",
-		type: Discord.ApplicationCommandTypes.ChatInput,
-		defaultMemberPermissions: ["VIEW_CHANNEL"],
-		handle: handleSubmitResource,
-	},
-	suggestion: {
-		identifier: "suggestion",
-		type: Discord.ApplicationCommandTypes.ChatInput,
-		defaultMemberPermissions: ["VIEW_CHANNEL"],
-		handle: handleMakeSuggestion,
-	},
-	ticket: {
-		identifier: "ticket",
-		type: Discord.ApplicationCommandTypes.ChatInput,
-		defaultMemberPermissions: ["VIEW_CHANNEL"],
-		options: {
-			open: {
-				identifier: "open",
-				type: Discord.ApplicationCommandOptionTypes.SubCommand,
-				handle: handleOpenTicket,
-			},
-		},
-	},
-	music: {
-		identifier: "music",
-		type: Discord.ApplicationCommandTypes.ChatInput,
-		defaultMemberPermissions: ["VIEW_CHANNEL"],
-		options: {
-			fastForward: {
-				identifier: "fast-forward",
-				type: Discord.ApplicationCommandOptionTypes.SubCommand,
-				handle: handleFastForward,
-				handleAutocomplete: handleFastForwardAutocomplete,
-				options: { timestamp: constants.parameters.timestamp },
-			},
-			history: {
-				identifier: "history",
-				type: Discord.ApplicationCommandOptionTypes.SubCommand,
-				handle: handleDisplayPlaybackHistory,
-				options: { show: constants.parameters.show },
-				flags: { isShowable: true },
-			},
-			loop: {
-				identifier: "loop",
-				type: Discord.ApplicationCommandOptionTypes.SubCommand,
-				handle: handleLoopPlayback,
-				options: { collection: constants.parameters.collection },
-			},
-			now: {
-				identifier: "now",
-				type: Discord.ApplicationCommandOptionTypes.SubCommand,
-				handle: handleDisplayCurrentlyPlaying,
-				options: { collection: constants.parameters.collection, show: constants.parameters.show },
-				flags: { isShowable: true },
-			},
-			pause: {
-				identifier: "pause",
-				type: Discord.ApplicationCommandOptionTypes.SubCommand,
-				handle: handlePausePlayback,
-			},
-			play: {
-				identifier: "play",
-				type: Discord.ApplicationCommandOptionTypes.SubCommandGroup,
-				options: {
-					stream: {
-						identifier: "stream",
-						type: Discord.ApplicationCommandOptionTypes.SubCommand,
-						handle: handleRequestStreamPlayback,
-						options: {
-							url: {
-								identifier: "url",
-								type: Discord.ApplicationCommandOptionTypes.String,
-								required: true,
-							},
-						},
-					},
-					youtube: {
-						identifier: "youtube",
-						type: Discord.ApplicationCommandOptionTypes.SubCommand,
-						handle: handleRequestYouTubePlayback,
-						options: { query: constants.parameters.query },
-					},
-				},
-			},
-			queue: {
-				identifier: "queue",
-				type: Discord.ApplicationCommandOptionTypes.SubCommand,
-				handle: handleDisplayPlaybackQueue,
-				options: { show: constants.parameters.show },
-				flags: { isShowable: true },
-			},
-			remove: {
-				identifier: "remove",
-				type: Discord.ApplicationCommandOptionTypes.SubCommand,
-				handle: handleRemoveSongListing,
-			},
-			replay: {
-				identifier: "replay",
-				type: Discord.ApplicationCommandOptionTypes.SubCommand,
-				handle: handleReplayAction,
-				options: { collection: constants.parameters.collection },
-			},
-			resume: {
-				identifier: "resume",
-				type: Discord.ApplicationCommandOptionTypes.SubCommand,
-				handle: handleResumePlayback,
-			},
-			rewind: {
-				identifier: "rewind",
-				type: Discord.ApplicationCommandOptionTypes.SubCommand,
-				handle: handleRewind,
-				handleAutocomplete: handleRewindAutocomplete,
-				options: { timestamp: constants.parameters.timestamp },
-			},
-			skipTo: {
-				identifier: "skip-to",
-				type: Discord.ApplicationCommandOptionTypes.SubCommand,
-				handle: handleSkipToTimestamp,
-				handleAutocomplete: handleSkipToTimestampAutocomplete,
-				options: { timestamp: constants.parameters.timestamp },
-			},
-			skip: {
-				identifier: "skip",
-				type: Discord.ApplicationCommandOptionTypes.SubCommand,
-				handle: handleSkipAction,
-				options: {
-					collection: constants.parameters.collection,
-					by: constants.parameters.by,
-					to: constants.parameters.to,
-				},
-			},
-			stop: {
-				identifier: "stop",
-				type: Discord.ApplicationCommandOptionTypes.SubCommand,
-				handle: handleStopPlayback,
-			},
-			unskip: {
-				identifier: "unskip",
-				type: Discord.ApplicationCommandOptionTypes.SubCommand,
-				handle: handleUnskipAction,
-				options: {
-					collection: constants.parameters.collection,
-					by: constants.parameters.by,
-					to: constants.parameters.to,
-				},
-			},
-			volume: {
-				identifier: "volume",
-				type: Discord.ApplicationCommandOptionTypes.SubCommandGroup,
-				options: {
-					display: {
-						identifier: "display",
-						type: Discord.ApplicationCommandOptionTypes.SubCommand,
-						handle: handleDisplayVolume,
-						options: { show: constants.parameters.show },
-						flags: { isShowable: true },
-					},
-					set: {
-						identifier: "set",
-						type: Discord.ApplicationCommandOptionTypes.SubCommand,
-						handle: handleSetVolume,
-						options: {
-							volume: {
-								identifier: "volume",
-								type: Discord.ApplicationCommandOptionTypes.Integer,
-								required: true,
-							},
-						},
-					},
-				},
-			},
-		},
-	},
-	praise: {
-		identifier: "praise",
-		type: Discord.ApplicationCommandTypes.ChatInput,
-		defaultMemberPermissions: ["VIEW_CHANNEL"],
-		handle: handlePraiseUser,
-		handleAutocomplete: handlePraiseUserAutocomplete,
-		options: {
-			user: constants.parameters.user,
-			comment: {
-				identifier: "comment",
-				type: Discord.ApplicationCommandOptionTypes.String,
-			},
-		},
-	},
-	profile: {
-		identifier: "profile",
-		type: Discord.ApplicationCommandTypes.ChatInput,
-		defaultMemberPermissions: ["VIEW_CHANNEL"],
-		options: {
-			view: {
-				identifier: "view",
-				type: Discord.ApplicationCommandOptionTypes.SubCommand,
-				handle: handleDisplayProfile,
-				handleAutocomplete: handleDisplayProfileAutocomplete,
-				options: { user: { ...constants.parameters.user, required: false }, show: constants.parameters.show },
-				flags: { isShowable: true },
-			},
-			roles: {
-				identifier: "roles",
-				type: Discord.ApplicationCommandOptionTypes.SubCommand,
-				handle: handleOpenRoleSelectionMenu,
 			},
 		},
 	},

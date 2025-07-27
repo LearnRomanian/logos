@@ -436,65 +436,6 @@ class CommandStore {
 			commands.push(this.commands.context);
 		}
 
-		if (guildDocument.hasEnabled("policy")) {
-			commands.push(this.commands.policy);
-		}
-
-		if (guildDocument.hasEnabled("rules")) {
-			commands.push(this.commands.rule);
-		}
-
-		if (guildDocument.hasEnabled("slowmode")) {
-			commands.push(this.commands.slowmode);
-		}
-
-		if (guildDocument.hasEnabled("timeouts")) {
-			commands.push(this.commands.timeout);
-		}
-
-		if (guildDocument.hasEnabled("purging")) {
-			commands.push(this.commands.purge);
-		}
-
-		if (guildDocument.hasEnabled("warns")) {
-			commands.push(this.commands.warn, this.commands.pardon);
-			commands.push(this.commands.list);
-		}
-
-		if (guildDocument.hasEnabled("reports")) {
-			commands.push(this.commands.report);
-		}
-
-		if (guildDocument.hasEnabled("suggestions")) {
-			commands.push(this.commands.suggestion);
-		}
-
-		if (guildDocument.hasEnabled("tickets")) {
-			commands.push(this.commands.ticket);
-		}
-
-		if (guildDocument.hasEnabled("resourceSubmissions")) {
-			commands.push(this.commands.resource);
-		}
-
-		if (guildDocument.hasEnabled("music")) {
-			if (this.#client.services.hasGlobalService("lavalink")) {
-				commands.push(this.commands.music);
-			} else {
-				this.log.warn(
-					`The music service is enabled on ${this.#client.diagnostics.guild(guildDocument.guildId)}, but the bot does not have a Lavalink connection. Skipping...`,
-				);
-			}
-		}
-
-		if (guildDocument.hasEnabled("praises")) {
-			commands.push(this.commands.praise);
-		}
-
-		if (guildDocument.hasEnabled("profile")) {
-			commands.push(this.commands.profile);
-		}
-
 		return [...this.#defaultCommands.map((command) => command.built), ...commands.map((command) => command.built)];
 	}
 
