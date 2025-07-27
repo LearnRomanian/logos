@@ -1,0 +1,8 @@
+node_modules/
+
+logs/*
+!logs/.keep
+plugins/*
+!plugins/.keep
+
+.env

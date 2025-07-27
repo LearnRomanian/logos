@@ -1,0 +1,85 @@
+{
+  "linter": {
+    "enabled": true,
+    "rules": {
+      "all": true,
+      "nursery": {
+        "all": true,
+        "noSecrets": "off",
+        "useExplicitType": "off",
+        "noProcessEnv": "off",
+        "useImportRestrictions": "off"
+      },
+      "style": {
+        "all": true,
+        "noNamespaceImport": "off",
+        "noDefaultExport": "off",
+        "useNamingConvention": "off",
+        "noNonNullAssertion": "off",
+        "useDefaultSwitchClause": "off"
+      },
+      "suspicious": {
+        "all": true,
+        "noExplicitAny": "off",
+        "noAssignInExpressions": "off",
+        "noEmptyBlockStatements": "off",
+        "useAwait": "off"
+      },
+      "complexity": {
+        "all": true,
+        "noExcessiveCognitiveComplexity": "off"
+      },
+      "correctness": {
+        "noNodejsModules": "off",
+        "noUndeclaredDependencies": "off"
+      }
+    }
+  },
+  "overrides": [
+    {
+      "include": [
+        "source/library/models/documents/*/*.ts"
+      ],
+      "linter": {
+        "rules": {
+          "style": {
+            "useFilenamingConvention": "off"
+          }
+        }
+      }
+    },
+    {
+      "include": [
+        "source/library/models/*.ts"
+      ],
+      "linter": {
+        "rules": {
+          "correctness": {
+            "noUnusedVariables": "off"
+          },
+          "suspicious": {
+            "noUnsafeDeclarationMerging": "off"
+          }
+        }
+      }
+    }
+  ],
+  "organizeImports": {
+    "enabled": true
+  },
+  "formatter": {
+    "enabled": true,
+    "formatWithErrors": true,
+    "indentWidth": 4,
+    "indentStyle": "tab",
+    "lineWidth": 120
+  },
+  "javascript": {
+    "globals": [
+      "Bun",
+      "Discord",
+      "Logos",
+      "constants"
+    ]
+  }
+}

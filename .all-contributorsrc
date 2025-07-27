@@ -1,0 +1,241 @@
+{
+  "projectName": "logos",
+  "projectOwner": "vxern",
+  "repoType": "github",
+  "repoHost": "https://github.com",
+  "files": [
+    "README.md"
+  ],
+  "imageSize": 100,
+  "commit": false,
+  "commitConvention": "angular",
+  "contributorsPerLine": 7,
+  "contributorsSortAlphabetically": false,
+  "linkToUsage": false,
+  "skipCi": true,
+  "contributors": [
+    {
+      "login": "vxern",
+      "name": "Dorian Oszczęda",
+      "avatar_url": ".github/assets/profile-pictures/vxern.jpeg",
+      "profile": "https://github.com/vxern",
+      "contributions": [
+        "maintenance",
+        "code",
+        "translation",
+        "design",
+        "test"
+      ]
+    },
+    {
+      "login": "nemokosch",
+      "name": "Nemokosch",
+      "profile": "https://github.com/2colours",
+      "avatar_url": ".github/assets/profile-pictures/nemokosch.png",
+      "contributions": [
+        "infra",
+        "userTesting",
+        "translation",
+        "ideas"
+      ]
+    },
+    {
+      "login": "16wardm",
+      "name": "Mattheos",
+      "profile": "https://github.com/16wardm",
+      "avatar_url": ".github/assets/profile-pictures/mattheos.png",
+      "contributions": [
+        "translation",
+        "userTesting",
+        "ideas"
+      ]
+    },
+    {
+      "login": "ferb02",
+      "name": "Victor",
+      "profile": "https://youtube.com/channel/UC4aqpjKwQfkqxmQO0Owy2QQ",
+      "avatar_url": ".github/assets/profile-pictures/victor.png",
+      "contributions": [
+        "userTesting",
+        "translation",
+        "ideas"
+      ]
+    },
+    {
+      "login": "mymy",
+      "name": "Mymy",
+      "avatar_url": ".github/assets/profile-pictures/mymy.jpeg",
+      "contributions": [
+        "userTesting",
+        "ideas"
+      ]
+    },
+    {
+      "login": "bean__queen",
+      "name": "Annie",
+      "avatar_url": ".github/assets/profile-pictures/annie.png",
+      "contributions": [
+        "userTesting",
+        "ideas"
+      ]
+    },
+    {
+      "login": "kamelNeoN",
+      "name": "Kamel",
+      "avatar_url": ".github/assets/profile-pictures/kamel.jpeg",
+      "contributions": [
+        "translation",
+        "ideas"
+      ]
+    },
+    {
+      "login": "vittorio3099",
+      "name": "Paul",
+      "avatar_url": ".github/assets/profile-pictures/paul.png",
+      "contributions": [
+        "translation",
+        "ideas"
+      ]
+    },
+    {
+      "login": "at.peace",
+      "name": "Alaska",
+      "avatar_url": ".github/assets/profile-pictures/alaska.png",
+      "contributions": [
+        "translation"
+      ]
+    },
+    {
+      "login": "asterfields_",
+      "name": "Asterfields",
+      "profile": "https://x.com/_stechi_",
+      "avatar_url": ".github/assets/profile-pictures/asterfields.png",
+      "contributions": [
+        "translation"
+      ]
+    },
+    {
+      "login": "adeniial",
+      "name": "aura",
+      "avatar_url": ".github/assets/profile-pictures/aura.png",
+      "contributions": [
+        "translation"
+      ]
+    },
+    {
+      "login": "eagely",
+      "name": "eagely",
+      "avatar_url": ".github/assets/profile-pictures/eagely.png",
+      "contributions": [
+        "translation"
+      ]
+    },
+    {
+      "login": "estheroide",
+      "name": "Esther",
+      "avatar_url": ".github/assets/profile-pictures/esther.png",
+      "contributions": [
+        "translation"
+      ]
+    },
+    {
+      "login": "hani_men12",
+      "name": "Haniel",
+      "avatar_url": ".github/assets/profile-pictures/haniel.jpeg",
+      "contributions": [
+        "translation"
+      ]
+    },
+    {
+      "login": "iiv",
+      "name": "iiv",
+      "avatar_url": ".github/assets/profile-pictures/iiv.png",
+      "contributions": [
+        "translation"
+      ]
+    },
+    {
+      "login": "megaglaceon",
+      "name": "Mega Glaceon",
+      "profile": "https://github.com/a-mcego",
+      "avatar_url": ".github/assets/profile-pictures/mega-glaceon.png",
+      "contributions": [
+        "translation"
+      ]
+    },
+    {
+      "login": "rottingrat666",
+      "name": "Mike",
+      "profile": "https://instagram.com/mike_dishakjian",
+      "avatar_url": ".github/assets/profile-pictures/mike.jpeg",
+      "contributions": [
+        "translation"
+      ]
+    },
+    {
+      "login": "moorddroom",
+      "name": "Moorddroom",
+      "avatar_url": ".github/assets/profile-pictures/moorddroom.jpeg",
+      "contributions": [
+        "translation"
+      ]
+    },
+    {
+      "login": "noxys",
+      "name": "Noxys",
+      "avatar_url": ".github/assets/profile-pictures/noxys.png",
+      "contributions": [
+        "translation"
+      ]
+    },
+    {
+      "login": "okruchchleba",
+      "name": "Okruch Chleba",
+      "avatar_url": ".github/assets/profile-pictures/okruch-chleba.png",
+      "contributions": [
+        "translation"
+      ]
+    },
+    {
+      "login": "pascu",
+      "name": "Pascu",
+      "avatar_url": ".github/assets/profile-pictures/pascu.png",
+      "contributions": [
+        "ideas"
+      ]
+    },
+    {
+      "login": "rodutnotira",
+      "name": "Rodut Notira",
+      "avatar_url": ".github/assets/profile-pictures/rodut-notira.png",
+      "contributions": [
+        "translation"
+      ]
+    },
+    {
+      "login": "telemaniak",
+      "name": "Telemaniak",
+      "profile": "mailto:macmillantrenton@gmail.com",
+      "avatar_url": ".github/assets/profile-pictures/telemaniak.png",
+      "contributions": [
+        "translation"
+      ]
+    },
+    {
+      "login": "theodeninmuhafizi",
+      "name": "Theodenin Muhafizi",
+      "avatar_url": ".github/assets/profile-pictures/theodenin-muhafizi.png",
+      "contributions": [
+        "translation"
+      ]
+    },
+    {
+      "login": "yeetfe",
+      "name": "Yeetfe",
+      "avatar_url": ".github/assets/profile-pictures/yeetfe.png",
+      "contributions": [
+        "translation"
+      ]
+    }
+  ]
+}
