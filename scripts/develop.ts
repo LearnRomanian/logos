@@ -47,7 +47,7 @@ const database = DatabaseStore.create({
 	environment,
 	cache: new CacheStore({ log: constants.loggers.silent }),
 });
-await database.setup({ prefetchDocuments: false });
+await database.setup();
 
 const availableMigrations = await getAvailableMigrations();
 const metadata = await DatabaseMetadata.getOrCreate(database, { migrations: Object.keys(availableMigrations) });
@@ -109,19 +109,12 @@ const shutdown = bot.shutdown();
 
 const document = new Guild(database, { guildId: guild.id.toString() });
 await document.update(database, () => {
-	document.isNative = true;
 	document.languages = {
 		localisation: "English/American",
 		target: "Romanian",
 		feature: "Romanian",
 	};
 	document.enabledFeatures = {
-		journalling: true,
-		notices: true,
-		informationNotices: true,
-		resourceNotices: true,
-		roleNotices: true,
-		welcomeNotices: true,
 		answers: true,
 		corrections: true,
 		cefr: true,
@@ -133,75 +126,8 @@ await document.update(database, () => {
 		context: true,
 		targetOnly: true,
 		roleLanguages: true,
-		alerts: true,
-		policy: true,
-		rules: true,
-		purging: true,
-		slowmode: true,
-		timeouts: true,
-		warns: true,
-		reports: true,
-		antiFlood: true,
-		verification: true,
-		dynamicVoiceChannels: true,
-		entry: true,
-		roleIndicators: true,
-		suggestions: true,
-		resourceSubmissions: true,
-		tickets: true,
-		music: true,
-		praises: true,
-		profile: true,
-	};
-	document.journalling = {
-		purging: true,
-		slowmode: true,
-		timeouts: true,
-		warns: true,
-		reports: true,
-		antiFlood: true,
-		verification: true,
-		suggestions: true,
-		resourceSubmissions: true,
-		tickets: true,
-		praises: true,
-	};
-	document.rateLimits = {};
-	document.management = {
-		verification: {
-			roles: [idByName(roles, "Head Guide"), idByName(roles, "Guide")],
-		},
-		reports: {
-			roles: [idByName(roles, "Head Guide"), idByName(roles, "Guide")],
-		},
-		suggestions: {
-			roles: [idByName(roles, "Head Guide"), idByName(roles, "Guide")],
-		},
-		resourceSubmissions: {
-			roles: [idByName(roles, "Head Guide"), idByName(roles, "Guide"), idByName(roles, "Trainee Guide")],
-		},
-		tickets: {
-			roles: [idByName(roles, "Head Guide"), idByName(roles, "Guide")],
-		},
 	};
 	document.features = {
-		journalling: {
-			channelId: idByName(channels, "journal"),
-		},
-		informationNotices: {
-			channelId: idByName(channels, "rules"),
-			inviteLink: `https://discord.gg/${inviteCode}`,
-		},
-		resourceNotices: {
-			channelId: idByName(channels, "resources"),
-		},
-		roleNotices: {
-			channelId: idByName(channels, "roles"),
-		},
-		welcomeNotices: {
-			channelId: idByName(channels, "welcome"),
-			ruleChannelId: idByName(channels, "rule"),
-		},
 		cefr: {
 			examples: {
 				a1: "Salut!\n- Salut.\nMă numesc Marian.\nTu cum te numești?\n- Eu mă numesc Carmen.\nÎmi pare bine.\n- Încântat.",
@@ -220,71 +146,6 @@ await document.update(database, () => {
 		},
 		roleLanguages: {
 			ids: {},
-		},
-		alerts: {
-			channelId: idByName(channels, "mod-chat"),
-		},
-		warns: {
-			expiration: [2, "month"],
-			limit: 3,
-			autoTimeout: {
-				duration: [1, "day"],
-			},
-		},
-		reports: {
-			channelId: idByName(channels, "reports"),
-		},
-		antiFlood: {
-			interval: [5, "second"],
-			messageCount: 3,
-			timeoutDuration: [1, "day"],
-		},
-		verification: {
-			channelId: idByName(channels, "verifications"),
-			voting: {
-				roles: [idByName(roles, "Head Guide"), idByName(roles, "Guide"), idByName(roles, "Trainee Guide")],
-				verdict: {
-					acceptance: {
-						type: "fraction",
-						value: 0.33,
-					},
-					rejection: {
-						type: "fraction",
-						value: 0.5,
-					},
-				},
-			},
-			activation: [
-				{
-					type: "account-age",
-					value: [6, "month"],
-				},
-			],
-		},
-		dynamicVoiceChannels: {
-			channels: [
-				{
-					id: idByName(channels, "Voice Chat"),
-					maximum: 3,
-				},
-			],
-		},
-		roleIndicators: {
-			limit: 1,
-			roles: [],
-		},
-		suggestions: {
-			channelId: idByName(channels, "suggestions"),
-		},
-		resourceSubmissions: {
-			channelId: idByName(channels, "materials"),
-		},
-		tickets: {
-			categoryId: idByName(channels, "Tickets"),
-			channelId: idByName(channels, "tickets"),
-		},
-		music: {
-			implicitVolume: 100,
 		},
 	};
 });

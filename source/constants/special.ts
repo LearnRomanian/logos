@@ -16,7 +16,6 @@ export default Object.freeze({
 	sigils: {
 		divider: "﹘",
 		separator: "・",
-		channelSeparator: "︲",
 	},
 	divider: "—",
 	dividerShort: "-",
@@ -26,9 +25,6 @@ export default Object.freeze({
 		continued: "(...)",
 	},
 	missingString: "?",
-	roles: {
-		back: "..",
-	},
 	game: {
 		mask: "░",
 	},

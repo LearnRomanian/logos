@@ -1,17 +1,10 @@
 import type { Collection } from "logos:constants/database";
 import type { DesiredProperties, DesiredPropertiesBehaviour } from "logos:constants/properties";
 import type { PromiseOr } from "logos:core/utilities";
-import type { EntryRequest } from "logos/models/entry-request";
 import type { Guild } from "logos/models/guild";
 import type { GuildStatistics } from "logos/models/guild-statistics";
 import type { Model } from "logos/models/model";
-import type { Praise } from "logos/models/praise";
-import type { Report } from "logos/models/report";
-import type { Resource } from "logos/models/resource";
-import type { Suggestion } from "logos/models/suggestion";
-import type { Ticket } from "logos/models/ticket";
 import type { User } from "logos/models/user";
-import type { Warning } from "logos/models/warning";
 import type pino from "pino";
 
 class CacheStore {
@@ -29,17 +22,9 @@ class CacheStore {
 		readonly roles: Map<bigint, Logos.Role>;
 	};
 	readonly documents: {
-		readonly entryRequests: Map<string, EntryRequest>;
 		readonly guildStatistics: Map<string, GuildStatistics>;
 		readonly guilds: Map<string, Guild>;
-		readonly praisesByAuthor: Map<string, Map<string, Praise>>;
-		readonly praisesByTarget: Map<string, Map<string, Praise>>;
-		readonly reports: Map<string, Report>;
-		readonly resources: Map<string, Resource>;
-		readonly suggestions: Map<string, Suggestion>;
-		readonly tickets: Map<string, Ticket>;
 		readonly users: Map<string, User>;
-		readonly warningsByTarget: Map<string, Map<string, Warning>>;
 	};
 
 	readonly #fetchRequests: Set<bigint>;
@@ -59,17 +44,9 @@ class CacheStore {
 			roles: new Map(),
 		};
 		this.documents = {
-			entryRequests: new Map(),
 			guildStatistics: new Map(),
 			guilds: new Map(),
-			praisesByAuthor: new Map(),
-			praisesByTarget: new Map(),
-			reports: new Map(),
-			resources: new Map(),
-			suggestions: new Map(),
-			tickets: new Map(),
 			users: new Map(),
-			warningsByTarget: new Map(),
 		};
 
 		this.#fetchRequests = new Set();
@@ -197,10 +174,6 @@ class CacheStore {
 				// Uncached
 				break;
 			}
-			case "EntryRequests": {
-				this.documents.entryRequests.set(document.partialId, document);
-				break;
-			}
 			case "GuildStatistics": {
 				this.documents.guildStatistics.set(document.partialId, document);
 				break;
@@ -209,47 +182,8 @@ class CacheStore {
 				this.documents.guilds.set(document.partialId, document);
 				break;
 			}
-			case "Praises": {
-				if (this.documents.praisesByAuthor.has(document.authorId)) {
-					this.documents.praisesByAuthor.get(document.authorId)?.set(document.partialId, document);
-				} else {
-					this.documents.praisesByAuthor.set(document.authorId, new Map([[document.partialId, document]]));
-				}
-
-				if (this.documents.praisesByTarget.has(document.targetId)) {
-					this.documents.praisesByTarget.get(document.targetId)?.set(document.partialId, document);
-				} else {
-					this.documents.praisesByTarget.set(document.targetId, new Map([[document.partialId, document]]));
-				}
-
-				break;
-			}
-			case "Reports": {
-				this.documents.reports.set(document.partialId, document);
-				break;
-			}
-			case "Resources": {
-				this.documents.resources.set(document.partialId, document);
-				break;
-			}
-			case "Suggestions": {
-				this.documents.suggestions.set(document.partialId, document);
-				break;
-			}
-			case "Tickets": {
-				this.documents.tickets.set(document.partialId, document);
-				break;
-			}
 			case "Users": {
 				this.documents.users.set(document.partialId, document);
-				break;
-			}
-			case "Warnings": {
-				if (this.documents.warningsByTarget.has(document.targetId)) {
-					this.documents.warningsByTarget.get(document.targetId)?.set(document.partialId, document);
-				} else {
-					this.documents.warningsByTarget.set(document.targetId, new Map([[document.partialId, document]]));
-				}
 				break;
 			}
 		}
@@ -261,10 +195,6 @@ class CacheStore {
 				// Uncached
 				break;
 			}
-			case "EntryRequests": {
-				this.documents.entryRequests.delete(document.partialId);
-				break;
-			}
 			case "Guilds": {
 				this.documents.guilds.delete(document.partialId);
 				break;
@@ -273,41 +203,8 @@ class CacheStore {
 				this.documents.guildStatistics.delete(document.partialId);
 				break;
 			}
-			case "Praises": {
-				if (this.documents.praisesByAuthor.has(document.authorId)) {
-					this.documents.praisesByAuthor.get(document.authorId)?.delete(document.partialId);
-				}
-
-				if (this.documents.praisesByTarget.has(document.targetId)) {
-					this.documents.praisesByTarget.get(document.targetId)?.delete(document.partialId);
-				}
-
-				break;
-			}
-			case "Reports": {
-				this.documents.reports.delete(document.partialId);
-				break;
-			}
-			case "Resources": {
-				this.documents.resources.delete(document.partialId);
-				break;
-			}
-			case "Suggestions": {
-				this.documents.suggestions.delete(document.partialId);
-				break;
-			}
-			case "Tickets": {
-				this.documents.tickets.delete(document.partialId);
-				break;
-			}
 			case "Users": {
 				this.documents.users.delete(document.partialId);
-				break;
-			}
-			case "Warnings": {
-				if (this.documents.warningsByTarget.has(document.targetId)) {
-					this.documents.warningsByTarget.get(document.targetId)?.delete(document.partialId);
-				}
 				break;
 			}
 		}

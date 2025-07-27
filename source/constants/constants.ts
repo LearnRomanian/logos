@@ -10,7 +10,6 @@ import directories from "logos:constants/directories";
 import discord from "logos:constants/discord";
 import emojis from "logos:constants/emojis";
 import endpoints from "logos:constants/endpoints";
-import gifs from "logos:constants/gifs";
 import keys from "logos:constants/keys";
 import languages from "logos:constants/languages";
 import lengths from "logos:constants/lengths";
@@ -22,12 +21,7 @@ import loggers from "logos:constants/loggers";
 import parameters from "logos:constants/parameters";
 import patterns from "logos:constants/patterns";
 import properties from "logos:constants/properties";
-import roles from "logos:constants/roles";
-import rules from "logos:constants/rules";
-import slowmode from "logos:constants/slowmode";
 import special from "logos:constants/special";
-import statuses from "logos:constants/statuses";
-import time from "logos:constants/time";
 
 const constants = Object.freeze({
 	PROJECT_NAME: "Logos",
@@ -38,6 +32,9 @@ const constants = Object.freeze({
 		format: "png",
 		size: 1024,
 	}),
+	STATUS_MESSAGE: "Helping you learn languages",
+	COMMAND_RATE_LIMIT_COUNT: 5,
+	COMMAND_RATE_LIMIT_WITHIN: 10 * 1000, // 10 seconds
 	MAXIMUM_DELETABLE_MESSAGES: 500,
 	MAXIMUM_INDEXABLE_MESSAGES: 1000,
 	MAXIMUM_CORRECTION_MESSAGE_LENGTH: 3072,
@@ -45,9 +42,7 @@ const constants = Object.freeze({
 	MAXIMUM_HISTORY_ENTRIES: 100,
 	MAXIMUM_QUEUE_ENTRIES: 100,
 	RESULTS_PER_PAGE: 10,
-	STATUS_CYCLE_PERIOD: 10 * time.second,
-	SLOWMODE_COLLISION_TIMEOUT: 5 * time.second,
-	AUTO_DELETE_MESSAGE_TIMEOUT: 10 * time.second,
+	AUTO_DELETE_MESSAGE_TIMEOUT: 10 * 1000, // 10 seconds
 	PICK_MISSING_WORD_CHOICES: 4,
 	SHORT_TEXT_LENGTH: 60,
 	SENTENCE_PAIRS_TO_SHOW: 5,
@@ -78,7 +73,6 @@ export default Object.freeze({
 	discord,
 	emojis,
 	endpoints,
-	gifs,
 	keys,
 	languages,
 	lengths,
@@ -90,10 +84,5 @@ export default Object.freeze({
 	parameters,
 	patterns,
 	properties,
-	roles,
-	rules,
-	slowmode,
 	special,
-	statuses,
-	time,
 });

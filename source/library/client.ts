@@ -151,14 +151,6 @@ class Client {
 		return this.interactions.displayModal.bind(this.interactions);
 	}
 
-	get resolveInteractionToMember(): InteractionStore["resolveInteractionToMember"] {
-		return this.interactions.resolveInteractionToMember.bind(this.interactions);
-	}
-
-	get autocompleteMembers(): InteractionStore["autocompleteMembers"] {
-		return this.interactions.autocompleteMembers.bind(this.interactions);
-	}
-
 	get registerCollector(): EventStore["registerCollector"] {
 		return this.#events.registerCollector.bind(this.#events);
 	}
@@ -244,7 +236,7 @@ class Client {
 		this.log.info("Starting client...");
 
 		await this.volatile?.setup();
-		await this.database.setup({ prefetchDocuments: true });
+		await this.database.setup();
 		await this.services.setup();
 		await this.#guilds.setup();
 		await this.interactions.setup();

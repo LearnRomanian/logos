@@ -10,10 +10,6 @@ export default Object.freeze({
 	roles,
 	flags,
 	services,
-	verification: {
-		for: "🟩",
-		against: "🟥",
-	},
 	link: "🔗",
 	source: "©️",
 	interactions: {

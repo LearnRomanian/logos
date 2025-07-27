@@ -8,33 +8,19 @@ import { MongoDBAdapter } from "logos/adapters/databases/mongodb/database";
 import { RavenDBAdapter } from "logos/adapters/databases/ravendb/database";
 import { RethinkDBAdapter } from "logos/adapters/databases/rethinkdb/database";
 import { DatabaseMetadata } from "logos/models/database-metadata";
-import { EntryRequest } from "logos/models/entry-request";
 import { Guild } from "logos/models/guild";
 import { GuildStatistics } from "logos/models/guild-statistics";
-import type { Model, ModelConstructor } from "logos/models/model";
-import { Praise } from "logos/models/praise";
-import { Report } from "logos/models/report";
-import { Resource } from "logos/models/resource";
-import { Suggestion } from "logos/models/suggestion";
-import { Ticket } from "logos/models/ticket";
+import type { ModelConstructor } from "logos/models/model";
 import { User } from "logos/models/user";
-import { Warning } from "logos/models/warning";
 import type { CacheStore } from "logos/stores/cache";
 import type pino from "pino";
 
 class DatabaseStore {
 	static readonly #classes: Record<Collection, ModelConstructor> = Object.freeze({
 		DatabaseMetadata: DatabaseMetadata,
-		EntryRequests: EntryRequest,
 		GuildStatistics: GuildStatistics,
 		Guilds: Guild,
-		Praises: Praise,
-		Reports: Report,
-		Resources: Resource,
-		Suggestions: Suggestion,
-		Tickets: Ticket,
 		Users: User,
-		Warnings: Warning,
 	} as const);
 
 	readonly log: pino.Logger;
@@ -103,51 +89,16 @@ class DatabaseStore {
 		return DatabaseStore.#classes[collection];
 	}
 
-	async setup({ prefetchDocuments = false }: { prefetchDocuments?: boolean } = {}): Promise<void> {
+	async setup(): Promise<void> {
 		this.log.info("Setting up database store...");
 
 		await this.#adapter.setup();
-
-		if (prefetchDocuments) {
-			await this.#prefetchDocuments();
-		}
 
 		this.log.info("Database store set up.");
 	}
 
 	async teardown(): Promise<void> {
 		await this.#adapter.teardown();
-	}
-
-	async #prefetchDocuments(): Promise<void> {
-		this.log.info("Prefetching documents...");
-
-		const collections = await Promise.all([
-			EntryRequest.getAll(this),
-			Report.getAll(this),
-			Resource.getAll(this),
-			Suggestion.getAll(this),
-			Ticket.getAll(this),
-		]);
-
-		const totalCount = collections.map((documents) => documents.length).reduce((a, b) => a + b, 0);
-		const counts = {
-			entryRequests: collections[0].length,
-			reports: collections[1].length,
-			resources: collections[2].length,
-			suggestions: collections[3].length,
-			tickets: collections[4].length,
-		};
-		this.log.info(`${totalCount} documents prefetched:`);
-		this.log.info(`- ${counts.entryRequests} entry requests.`);
-		this.log.info(`- ${counts.reports} reports.`);
-		this.log.info(`- ${counts.resources} resources.`);
-		this.log.info(`- ${counts.suggestions} suggestions.`);
-		this.log.info(`- ${counts.tickets} tickets.`);
-
-		for (const documents of collections) {
-			this.cache.cacheDocuments<Model>(documents);
-		}
 	}
 }
 

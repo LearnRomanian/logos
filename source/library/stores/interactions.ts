@@ -1,11 +1,10 @@
-import { timestamp, trim } from "logos:constants/formatting";
+import { timestamp } from "logos:constants/formatting";
 import {
 	type LearningLanguage,
 	type LearningLocale,
 	getLearningLocaleByLanguage,
 } from "logos:constants/languages/learning";
 import { getLocalisationLocaleByLanguage } from "logos:constants/languages/localisation";
-import { getSnowflakeFromIdentifier } from "logos:constants/patterns";
 import type { Client } from "logos/client";
 import { InteractionCollector } from "logos/collectors";
 import type { Guild } from "logos/models/guild";
@@ -288,7 +287,7 @@ class InteractionStore {
 				this.warning(interaction, {
 					title: strings.title,
 					description: `${strings.description.tooManyUses({
-						times: constants.defaults.COMMAND_RATE_LIMIT.uses,
+						times: constants.COMMAND_RATE_LIMIT_COUNT,
 					})}\n\n${strings.description.cannotUseUntil({
 						relative_timestamp: timestamp(rateLimit.nextAllowedUsageTimestamp, {
 							format: "relative",
@@ -543,223 +542,6 @@ class InteractionStore {
 	#autoDeleteReply(interaction: Logos.Interaction): void {
 		setTimeout(() => this.#client.deleteReply(interaction).ignore(), constants.AUTO_DELETE_MESSAGE_TIMEOUT);
 	}
-
-	#resolveIdentifierToMembers({
-		guildId,
-		seekerUserId,
-		identifier,
-		options,
-	}: {
-		guildId: bigint;
-		seekerUserId: bigint;
-		identifier: string;
-		options?: Partial<MemberNarrowingOptions>;
-	}): [members: Logos.Member[], isResolved: boolean] | undefined {
-		if (identifier.trim().length === 0) {
-			return [[], false];
-		}
-
-		const seeker = this.#client.entities.members.get(guildId)?.get(seekerUserId);
-		if (seeker === undefined) {
-			return undefined;
-		}
-
-		const guild = this.#client.entities.guilds.get(guildId);
-		if (guild === undefined) {
-			return undefined;
-		}
-
-		const moderatorRoleIds = guild.roles
-			.array()
-			.filter((role) => role.permissions.has("MODERATE_MEMBERS"))
-			.map((role) => role.id);
-
-		const id = getSnowflakeFromIdentifier(identifier);
-		if (id !== undefined) {
-			const member = this.#client.entities.members.get(guildId)?.get(BigInt(id));
-			if (member === undefined) {
-				return undefined;
-			}
-
-			if (options?.restrictToSelf && member.id !== seeker.id) {
-				return undefined;
-			}
-
-			if (options?.restrictToNonSelf && member.id === seeker.id) {
-				return undefined;
-			}
-
-			if (options?.excludeModerators && moderatorRoleIds.some((roleId) => member.roles.includes(roleId))) {
-				return undefined;
-			}
-
-			return [[member], true];
-		}
-
-		const cachedMembers = options?.restrictToSelf ? [seeker] : guild.members.array();
-		const members = cachedMembers.filter(
-			(member) =>
-				(options?.restrictToNonSelf ? member.user?.id !== seeker.user?.id : true) &&
-				(options?.excludeModerators ? !moderatorRoleIds.some((roleId) => member.roles.includes(roleId)) : true),
-		);
-
-		if (constants.patterns.discord.userHandle.old.test(identifier)) {
-			const identifierLowercase = identifier.toLowerCase();
-			const member = members.find(
-				(member) =>
-					member.user !== undefined &&
-					`${member.user.username.toLowerCase()}#${member.user.discriminator}`.includes(identifierLowercase),
-			);
-			if (member === undefined) {
-				return [[], false];
-			}
-
-			return [[member], true];
-		}
-
-		if (constants.patterns.discord.userHandle.new.test(identifier)) {
-			const identifierLowercase = identifier.toLowerCase();
-			const member = members.find((member) => member.user?.username?.toLowerCase().includes(identifierLowercase));
-			if (member === undefined) {
-				return [[], false];
-			}
-
-			return [[member], true];
-		}
-
-		const identifierLowercase = identifier.toLowerCase();
-		const matchedMembers = members.filter((member) => {
-			if (member.user?.toggles?.has("bot") && !options?.includeBots) {
-				return false;
-			}
-
-			if (
-				member.user &&
-				`${member.user.username.toLowerCase()}#${member.user.discriminator}`.includes(identifierLowercase)
-			) {
-				return true;
-			}
-
-			if (member.user?.username.toLowerCase().includes(identifierLowercase)) {
-				return true;
-			}
-
-			return member.nick?.toLowerCase().includes(identifierLowercase);
-		});
-
-		return [matchedMembers, false];
-	}
-
-	resolveInteractionToMember(
-		interaction: Logos.Interaction,
-		{
-			identifier,
-			options,
-		}: {
-			identifier: string;
-			options?: Partial<MemberNarrowingOptions>;
-		},
-	): Logos.Member | undefined {
-		const result = this.#resolveIdentifierToMembers({
-			guildId: interaction.guildId,
-			seekerUserId: interaction.user.id,
-			identifier,
-			options,
-		});
-		if (result === undefined) {
-			return;
-		}
-
-		const [matchedMembers, isResolved] = result;
-		if (isResolved) {
-			return matchedMembers.at(0);
-		}
-
-		if (matchedMembers.length === 0) {
-			if (
-				interaction.type === Discord.InteractionTypes.ApplicationCommand ||
-				interaction.type === Discord.InteractionTypes.MessageComponent ||
-				interaction.type === Discord.InteractionTypes.ModalSubmit
-			) {
-				const strings = constants.contexts.invalidUser({
-					localise: this.#client.localise,
-					locale: interaction.locale,
-				});
-				this.error(interaction, {
-					title: strings.title,
-					description: strings.description,
-				}).ignore();
-
-				return undefined;
-			}
-
-			return undefined;
-		}
-
-		return matchedMembers.at(0);
-	}
-
-	async autocompleteMembers(
-		interaction: Logos.Interaction,
-		{
-			identifier,
-			options,
-		}: {
-			identifier: string;
-			options?: Partial<MemberNarrowingOptions>;
-		},
-	): Promise<void> {
-		const identifierTrimmed = identifier.trim();
-		if (identifierTrimmed.length === 0) {
-			const strings = constants.contexts.autocompleteUser({
-				localise: this.#client.localise,
-				locale: interaction.locale,
-			});
-			await this.respond(interaction, [{ name: trim(strings.autocomplete, 100), value: "" }]);
-			return;
-		}
-
-		const result = this.#resolveIdentifierToMembers({
-			guildId: interaction.guildId,
-			seekerUserId: interaction.user.id,
-			identifier: identifierTrimmed,
-			options,
-		});
-		if (result === undefined) {
-			return;
-		}
-
-		const [matchedMembers, _] = result;
-
-		const users: Logos.User[] = [];
-		for (const member of matchedMembers) {
-			if (users.length === 20) {
-				break;
-			}
-
-			const user = member.user;
-			if (user === undefined) {
-				continue;
-			}
-
-			users.push(user);
-		}
-
-		await this.respond(
-			interaction,
-			users.map((user) => ({
-				name: this.#client.diagnostics.user(user, { prettify: true }),
-				value: user.id.toString(),
-			})),
-		);
-	}
-}
-
-interface MemberNarrowingOptions {
-	readonly includeBots: boolean;
-	readonly restrictToSelf: boolean;
-	readonly restrictToNonSelf: boolean;
-	readonly excludeModerators: boolean;
 }
 
 function isEmbed(embedOrData: EmbedOrCallbackData): embedOrData is Discord.Camelize<Discord.DiscordEmbed> {

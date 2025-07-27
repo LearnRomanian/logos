@@ -1,6 +1,5 @@
 import { isAutocomplete } from "logos:constants/interactions";
 import { getDiscordLanguageByLocale } from "logos:constants/languages/localisation";
-import { timeStructToMilliseconds } from "logos:constants/time";
 import { isDefined } from "logos:core/utilities";
 import type { Client } from "logos/client";
 import type {
@@ -465,24 +464,22 @@ class CommandStore {
 			return undefined;
 		}
 
-		const intervalMilliseconds = timeStructToMilliseconds(constants.defaults.COMMAND_RATE_LIMIT.within);
-
 		const memberId = this.#client.bot.transformers.snowflake(`${interaction.user.id}${interaction.guildId}`);
 
 		const timestamps = this.#getLastCommandUseTimestamps({
 			memberId,
 			commandId,
 			executedAt,
-			intervalMilliseconds,
+			intervalMilliseconds: constants.COMMAND_RATE_LIMIT_WITHIN,
 		});
 
-		if (timestamps.length + 1 > constants.defaults.COMMAND_RATE_LIMIT.uses) {
+		if (timestamps.length + 1 > constants.COMMAND_RATE_LIMIT_COUNT) {
 			const lastTimestamp = timestamps.at(0);
 			if (lastTimestamp === undefined) {
 				throw new Error("Unexpectedly undefined initial timestamp.");
 			}
 
-			const nextAllowedUsageTimestamp = intervalMilliseconds - executedAt - lastTimestamp;
+			const nextAllowedUsageTimestamp = constants.COMMAND_RATE_LIMIT_WITHIN - executedAt - lastTimestamp;
 
 			return { nextAllowedUsageTimestamp };
 		}

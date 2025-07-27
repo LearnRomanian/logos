@@ -1,6 +1,5 @@
 import type { Client } from "logos/client";
-// biome-ignore lint/nursery/noExportedImports: The re-export of `RateLimit` is okay for now.
-import type { FeatureManagement, GuildDocument, RateLimit } from "logos/models/documents/guild";
+import type { GuildDocument } from "logos/models/documents/guild";
 import { GuildStatistics } from "logos/models/guild-statistics";
 import { type CreateModelOptions, GuildModel, type IdentifierData, Model } from "logos/models/model";
 import type { DatabaseStore } from "logos/stores/database";
@@ -17,7 +16,7 @@ class Guild extends GuildModel {
 
 	constructor(
 		database: DatabaseStore,
-		{ createdAt, isNative, languages, enabledFeatures, journalling, features, ...data }: CreateGuildOptions,
+		{ createdAt, languages, enabledFeatures, features, ...data }: CreateGuildOptions,
 	) {
 		super(database, data, { collection: "Guilds" });
 
@@ -28,12 +27,6 @@ class Guild extends GuildModel {
 			feature: constants.defaults.FEATURE_LANGUAGE,
 		};
 		this.enabledFeatures = enabledFeatures ?? {
-			journalling: false,
-			notices: false,
-			informationNotices: false,
-			resourceNotices: false,
-			roleNotices: false,
-			welcomeNotices: false,
 			answers: false,
 			corrections: false,
 			cefr: false,
@@ -45,41 +38,8 @@ class Guild extends GuildModel {
 			context: false,
 			targetOnly: false,
 			roleLanguages: false,
-			alerts: false,
-			policy: false,
-			rules: false,
-			purging: false,
-			slowmode: false,
-			timeouts: false,
-			warns: false,
-			reports: false,
-			antiFlood: false,
-			verification: false,
-			dynamicVoiceChannels: false,
-			entry: false,
-			roleIndicators: false,
-			suggestions: false,
-			resourceSubmissions: false,
-			tickets: false,
-			music: false,
-			praises: false,
-			profile: false,
-		};
-		this.journalling = journalling ?? {
-			purging: false,
-			slowmode: false,
-			timeouts: false,
-			warns: false,
-			reports: false,
-			antiFlood: false,
-			verification: false,
-			suggestions: false,
-			resourceSubmissions: false,
-			tickets: false,
-			praises: false,
 		};
 		this.features = features ?? {};
-		this.isNative = isNative ?? false;
 	}
 
 	static async get(client: Client, data: IdentifierData<Guild>): Promise<Guild | undefined> {
@@ -133,18 +93,6 @@ class Guild extends GuildModel {
 		return configuration;
 	}
 
-	isJournalled(feature: keyof Guild["journalling"]): boolean {
-		return this.journalling[feature];
-	}
-
-	rateLimit(feature: keyof Guild["rateLimits"]): RateLimit | undefined {
-		return this.rateLimits[feature];
-	}
-
-	managers(feature: keyof Guild["management"]): FeatureManagement | undefined {
-		return this.management[feature];
-	}
-
 	isTargetLanguageOnlyChannel(channelId: string): boolean {
 		if (!this.hasEnabled("targetOnly")) {
 			return false;
@@ -155,4 +103,4 @@ class Guild extends GuildModel {
 }
 
 export { Guild };
-export type { CreateGuildOptions, RateLimit };
+export type { CreateGuildOptions };

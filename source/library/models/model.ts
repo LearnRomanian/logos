@@ -1,9 +1,7 @@
 import { type Collection, isValidCollection } from "logos:constants/database";
 import { capitalise, decapitalise } from "logos:constants/formatting";
-import { timeStructToMilliseconds } from "logos:constants/time";
 import type { DocumentConventions } from "logos/adapters/databases/adapter";
 import type { Client } from "logos/client";
-import type { RateLimit } from "logos/models/guild";
 import type { DatabaseStore } from "logos/stores/database";
 
 type ClientOrDatabaseStore = Client | DatabaseStore;
@@ -132,22 +130,6 @@ abstract class Model<Generic extends { collection: Collection; idParts: readonly
 		return promise;
 	}
 
-	static crossesRateLimit<M extends Model>(documents: M[], rateLimit: RateLimit): boolean {
-		const timestamps = documents
-			.map((document) => document.createdAt)
-			.toSorted((a, b) => b - a) // From most recent to least recent.
-			.slice(0, rateLimit.uses);
-		// Has not reached the limit, regardless of the limiting time period.
-		if (timestamps.length < rateLimit.uses) {
-			return false;
-		}
-
-		const now = Date.now();
-		const interval = timeStructToMilliseconds(rateLimit.within);
-
-		return timestamps.some((timestamp) => now - timestamp < interval);
-	}
-
 	async create(clientOrDatabase: ClientOrDatabaseStore): Promise<void> {
 		await getDatabase(clientOrDatabase).withSession(async (session) => {
 			await session.set(this);
@@ -173,16 +155,9 @@ abstract class Model<Generic extends { collection: Collection; idParts: readonly
 }
 
 const DatabaseMetadataModel = Model<{ collection: "DatabaseMetadata"; idParts: [] }>;
-const EntryRequestModel = Model<{ collection: "EntryRequests"; idParts: ["guildId", "authorId"] }>;
 const GuildModel = Model<{ collection: "Guilds"; idParts: ["guildId"] }>;
 const GuildStatisticsModel = Model<{ collection: "GuildStatistics"; idParts: ["guildId"] }>;
-const PraiseModel = Model<{ collection: "Praises"; idParts: ["guildId", "authorId", "targetId", "createdAt"] }>;
-const ReportModel = Model<{ collection: "Reports"; idParts: ["guildId", "authorId", "createdAt"] }>;
-const ResourceModel = Model<{ collection: "Resources"; idParts: ["guildId", "authorId", "createdAt"] }>;
-const SuggestionModel = Model<{ collection: "Suggestions"; idParts: ["guildId", "authorId", "createdAt"] }>;
-const TicketModel = Model<{ collection: "Tickets"; idParts: ["guildId", "authorId", "channelId"] }>;
 const UserModel = Model<{ collection: "Users"; idParts: ["userId"] }>;
-const WarningModel = Model<{ collection: "Warnings"; idParts: ["guildId", "authorId", "targetId", "createdAt"] }>;
 
 function getDatabase(clientOrDatabase: ClientOrDatabaseStore): DatabaseStore {
 	if ("database" in clientOrDatabase) {
@@ -192,21 +167,7 @@ function getDatabase(clientOrDatabase: ClientOrDatabaseStore): DatabaseStore {
 	return clientOrDatabase;
 }
 
-export {
-	Model,
-	DatabaseMetadataModel,
-	EntryRequestModel,
-	GuildModel,
-	GuildStatisticsModel,
-	PraiseModel,
-	ReportModel,
-	ResourceModel,
-	SuggestionModel,
-	TicketModel,
-	UserModel,
-	WarningModel,
-	getDatabase,
-};
+export { Model, DatabaseMetadataModel, GuildModel, GuildStatisticsModel, UserModel, getDatabase };
 export type {
 	IdentifierParts,
 	IdentifierData,

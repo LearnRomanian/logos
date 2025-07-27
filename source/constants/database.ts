@@ -1,15 +1,8 @@
 const collections = Object.freeze([
 	"DatabaseMetadata",
-	"EntryRequests",
 	"Guilds",
 	"GuildStatistics",
-	"Praises",
-	"Reports",
-	"Resources",
-	"Suggestions",
-	"Tickets",
 	"Users",
-	"Warnings",
 ] as const satisfies readonly string[]);
 type Collection = (typeof collections)[number];
 

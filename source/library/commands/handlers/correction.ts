@@ -46,6 +46,7 @@ async function handleMakeCorrection(
 		return;
 	}
 
+	// TODO(vxern): This should be part of the correction configuration.
 	const doNotCorrectMeRoleId = (
 		constants.roles.learning.collection.list.doNotCorrectMe.snowflakes as Record<string, string>
 	)[interaction.guildId.toString()];
