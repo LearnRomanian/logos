@@ -23,6 +23,9 @@ interface GuildDocument {
 		roleLanguages: boolean;
 	};
 	features: {
+		corrections?: {
+			doNotCorrectRoleIds: [];
+		};
 		cefr?: {
 			examples?: {
 				a1: string;
