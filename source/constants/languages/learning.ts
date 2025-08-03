@@ -397,6 +397,7 @@ const wiktionaryLanguageNames: Record<WithBaseLanguage<LearningLanguage>, string
 	"SerboCroatian/Croatian": "Serbo-Croatian",
 	"SerboCroatian/Montenegrin": "Serbo-Croatian",
 	"SerboCroatian/Serbian": "Serbo-Croatian",
+	SerboCroatian: "Serbo-Croatian",
 	"Sotho/Southern": "Sotho",
 	"Arabic/Egyptian": "Arabic",
 	"Azerbaijani/Southern": "Azerbaijani",
