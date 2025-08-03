@@ -56,7 +56,7 @@
     "@discordeno/bot": "^21.0.0",
     "@vxern/eld": "^1.1.0",
     "cldpre": "^2.9.0",
-    "dexonline-scraper": "^0.2.2",
+    "dexonline-scraper": "^0.2.3",
     "diff": "^8.0.2",
     "dotenv": "^16.6.1",
     "fastest-levenshtein": "^1.0.16",

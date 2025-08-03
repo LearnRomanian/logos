@@ -7,7 +7,7 @@
         "@discordeno/bot": "^21.0.0",
         "@vxern/eld": "^1.1.0",
         "cldpre": "^2.9.0",
-        "dexonline-scraper": "^0.2.2",
+        "dexonline-scraper": "^0.2.3",
         "diff": "^8.0.2",
         "dotenv": "^16.6.1",
         "fastest-levenshtein": "^1.0.16",
@@ -174,7 +174,7 @@
 
     "denque": ["denque@2.1.0", "", {}, "sha512-HVQE3AAb/pxF8fQAoiqpvg9i3evqug3hoiwakOyZAwJm+6vZehbkYXZ0l4JxS+I3QxM97v5aaRNhj8v5oBhekw=="],
 
-    "dexonline-scraper": ["dexonline-scraper@0.2.2", "", { "dependencies": { "cheerio": "1.0.0-rc.12" } }, "sha512-40a7Up1rDH+R/A2XDamEl8vfU7wDwtk154jCyqlS9UDKaWNHTCyupbjpshSFRzFt+mb6Yoj8FNm1vno5FDZ9vQ=="],
+    "dexonline-scraper": ["dexonline-scraper@0.2.3", "", { "dependencies": { "cheerio": "1.0.0-rc.12" } }, "sha512-aarymQX5/gtXBra2L4KH9iNFoSmags35UGirjQrlCCVJWjP8CnchJ/jRQwkogJMWHzQDV8CK/qT3l3h+GZ53Sg=="],
 
     "diff": ["diff@8.0.2", "", {}, "sha512-sSuxWU5j5SR9QQji/o2qMvqRNYRDOcBTgsJ/DeCf4iSN4gW+gNMXM7wFIP+fdXZxoNiAnHUTGjCr+TSWXdRDKg=="],
 
