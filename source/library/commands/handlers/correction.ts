@@ -1,6 +1,7 @@
 import { diffWordsWithSpace } from "diff";
 import type { Client } from "logos/client";
 import { CorrectionComposer } from "logos/commands/components/modal-composers/correction-composer";
+import { Guild } from "logos/models/guild";
 
 type CorrectionMode = "partial" | "full";
 
@@ -17,6 +18,8 @@ async function handleMakeCorrection(
 	interaction: Logos.Interaction,
 	{ mode }: { mode: CorrectionMode },
 ): Promise<void> {
+	const guildDocument = await Guild.getOrCreate(client, { guildId: interaction.guildId.toString() });
+
 	const member = client.entities.members.get(interaction.guildId)?.get(interaction.user.id);
 	if (member === undefined) {
 		return;
@@ -46,14 +49,8 @@ async function handleMakeCorrection(
 		return;
 	}
 
-	// TODO(vxern): This should be part of the correction configuration.
-	const doNotCorrectMeRoleId = (
-		constants.roles.learning.collection.list.doNotCorrectMe.snowflakes as Record<string, string>
-	)[interaction.guildId.toString()];
-	if (
-		doNotCorrectMeRoleId !== undefined &&
-		correctedMember.roles.some((roleId) => roleId.toString() === doNotCorrectMeRoleId)
-	) {
+	const doNotCorrectMeRoleIds = guildDocument.feature("corrections").doNotCorrectRoleIds;
+	if (correctedMember.roles.some((roleId) => doNotCorrectMeRoleIds.includes(roleId.toString()))) {
 		const strings = constants.contexts.userDoesNotWantCorrections({
 			localise: client.localise,
 			locale: interaction.locale,

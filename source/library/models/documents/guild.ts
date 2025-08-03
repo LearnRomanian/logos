@@ -24,7 +24,7 @@ interface GuildDocument {
 	};
 	features: {
 		corrections?: {
-			doNotCorrectRoleIds: [];
+			doNotCorrectRoleIds: string[];
 		};
 		cefr?: {
 			examples?: {
