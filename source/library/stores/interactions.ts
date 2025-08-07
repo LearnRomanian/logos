@@ -13,7 +13,7 @@ import type { CommandStore } from "logos/stores/commands";
 import { nanoid } from "nanoid";
 import type pino from "pino";
 
-type InteractionCallbackData = Omit<Discord.InteractionCallbackData, "flags">;
+type InteractionCallbackData = Discord.InteractionCallbackData;
 type EmbedOrCallbackData = Discord.Camelize<Discord.DiscordEmbed> | InteractionCallbackData;
 interface ReplyData {
 	readonly ephemeral: boolean;
