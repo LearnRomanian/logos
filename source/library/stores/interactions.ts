@@ -416,7 +416,11 @@ class InteractionStore {
 		const data = getInteractionCallbackData(embedOrData);
 
 		if (!visible) {
-			data.flags = Discord.MessageFlags.Ephemeral;
+			if (data.flags !== undefined) {
+				data.flags |= Discord.MessageFlags.Ephemeral;
+			} else {
+				data.flags = Discord.MessageFlags.Ephemeral;
+			}
 		}
 
 		this.#replies.set(interaction.token, { ephemeral: !visible });
