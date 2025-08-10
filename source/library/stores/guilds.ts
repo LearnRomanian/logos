@@ -51,7 +51,10 @@ class GuildStore {
 		this.log.info("Guild store torn down.");
 	}
 
-	async #setupGuild(guild: Discord.Guild | Logos.Guild): Promise<void> {
+	async #setupGuild(
+		guild: Discord.Guild | Logos.Guild,
+		{ isReload = false }: { isReload?: boolean } = {},
+	): Promise<void> {
 		// This check prevents the same guild being set up multiple times. This can happen when a shard managing a
 		// given guild is closed and another shard is spun up, causing Discord to dispatch the `GUILD_CREATE` event
 		// again for a guild that Logos would already have been managing.
@@ -59,9 +62,42 @@ class GuildStore {
 			return;
 		}
 
+		if (!isReload) {
+			await this.#setupGuildForFirstTime(guild);
+		}
+
 		const guildDocument = await Guild.getOrCreate(this.#client, { guildId: guild.id.toString() });
 		await this.#services.startForGuild({ guildId: guild.id, guildDocument });
 		await this.#commands.registerGuildCommands({ guildId: guild.id, guildDocument });
+	}
+
+	async #setupGuildForFirstTime(guild: Discord.Guild | Logos.Guild): Promise<void> {
+		this.log.info(`Setting Logos up on ${this.#client.diagnostics.guild(guild)}...`);
+
+		await this.#prefetchMembers(guild);
+
+		this.log.info(`Logos has been set up on ${this.#client.diagnostics.guild(guild)}.`);
+	}
+
+	async #prefetchMembers(guild: Discord.Guild | Logos.Guild): Promise<void> {
+		this.log.info(`Fetching ~${guild.memberCount} members of ${this.#client.diagnostics.guild(guild)}...`);
+
+		const members = await this.#client.bot.gateway
+			.requestMembers(guild.id, { limit: 0, query: "", nonce: Date.now().toString() })
+			.catch((error) => {
+				this.log.warn(error, `Failed to fetch members of ${this.#client.diagnostics.guild(guild)}.`);
+				return [];
+			});
+		for (const member of members) {
+			this.#client.bot.transformers.member(
+				this.#client.bot,
+				member as unknown as Discord.DiscordMember,
+				guild.id,
+				member.user.id,
+			);
+		}
+
+		this.log.info(`Fetched ~${guild.memberCount} members of ${this.#client.diagnostics.guild(guild)}.`);
 	}
 
 	async #teardownGuild({ guildId }: { guildId: bigint }): Promise<void> {
@@ -84,7 +120,7 @@ class GuildStore {
 		this.log.info(`Reloading ${this.#client.diagnostics.guild(guildId)}...`);
 
 		await this.#teardownGuild({ guildId });
-		await this.#setupGuild(guild);
+		await this.#setupGuild(guild, { isReload: true });
 
 		this.log.info(`${this.#client.diagnostics.guild(guildId)} has been reloaded.`);
 	}
