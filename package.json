@@ -1,9 +1,9 @@
 {
   "$schema": "https://json.schemastore.org/package",
   "name": "logos",
-  "description": "A multi-purpose community bot built to cater to language-learning communities on Discord.",
+  "description": "The application for language & linguistics communities on Discord.",
   "license": "Apache-2.0",
-  "version": "4.58.0",
+  "version": "0.1.0",
   "type": "module",
   "keywords": [
     "discord",
