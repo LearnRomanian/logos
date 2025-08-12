@@ -17,27 +17,32 @@ async function handleDisplayResources(client: Client, interaction: Logos.Interac
 		}),
 	};
 
-	const buttons: Discord.ButtonComponent[] = [
-		{
-			type: Discord.MessageComponentTypes.Button,
-			label: strings.redirect({ language: strings.language(interaction.featureLanguage) }),
-			style: Discord.ButtonStyles.Link,
-			url: configuration.url,
-		},
-	];
-
-	if (!interaction.parameters.show) {
-		buttons.push(client.services.global("interactionRepetition").getShowButton(interaction));
-	}
-
 	client
 		.reply(
 			interaction,
 			{
+				flags: Discord.MessageFlags.IsComponentV2,
 				components: [
 					{
-						type: Discord.MessageComponentTypes.ActionRow,
-						components: buttons as [Discord.ButtonComponent],
+						type: Discord.MessageComponentTypes.Container,
+						components: [
+							{
+								type: Discord.MessageComponentTypes.ActionRow,
+								components: [
+									{
+										type: Discord.MessageComponentTypes.Button,
+										label: strings.redirect({
+											language: strings.language(interaction.featureLanguage),
+										}),
+										style: Discord.ButtonStyles.Link,
+										url: configuration.url,
+									},
+									...(interaction.parameters.show
+										? []
+										: [client.services.global("interactionRepetition").getShowButton(interaction)]),
+								],
+							},
+						],
 					},
 				],
 			},

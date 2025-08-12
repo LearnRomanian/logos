@@ -104,24 +104,29 @@ async function handleMakeCorrection(
 		const strings = constants.contexts.correction({ localise: client.localise, locale: interaction.locale });
 		client.bot.helpers
 			.sendMessage(message.channelId, {
+				flags: Discord.MessageFlags.IsComponentV2,
 				messageReference: {
 					messageId: message.id,
 					channelId: message.channelId,
 					guildId: interaction.guildId,
 					failIfNotExists: false,
 				},
-				embeds: [
+				components: [
 					{
-						description: content,
-						color: constants.colours.success,
-						footer: {
-							text: `${constants.emojis.commands.correction} ${strings.suggestedBy({
-								username: client.diagnostics.user(interaction.user),
-							})}`,
-							iconUrl: Discord.avatarUrl(interaction.user.id, interaction.user.discriminator, {
-								avatar: interaction.user.avatar,
-							}),
-						},
+						type: Discord.MessageComponentTypes.Container,
+						accentColor: constants.colours.success,
+						components: [
+							{
+								type: Discord.MessageComponentTypes.TextDisplay,
+								content,
+							},
+							{
+								type: Discord.MessageComponentTypes.TextDisplay,
+								content: `-# ${constants.emojis.commands.correction} ${strings.suggestedBy({
+									username: interaction.member?.nick ?? interaction.user.username,
+								})}`,
+							},
+						],
 					},
 				],
 			})

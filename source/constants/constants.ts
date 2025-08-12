@@ -32,7 +32,7 @@ const constants = Object.freeze({
 		format: "png",
 		size: 1024,
 	}),
-	STATUS_MESSAGE: "Helping you learn languages",
+	STATUS_MESSAGE: "Helping you learn languages! 🌍",
 	COMMAND_RATE_LIMIT_COUNT: 5,
 	COMMAND_RATE_LIMIT_WITHIN: 10 * 1000, // 10 seconds
 	MAXIMUM_DELETABLE_MESSAGES: 500,

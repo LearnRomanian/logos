@@ -2,7 +2,7 @@ import type { WithRequired } from "logos:core/utilities";
 import type { Client } from "logos/client";
 import { InteractionCollector } from "logos/collectors";
 
-type TypedInputTextComponent<CustomID> = WithRequired<Discord.InputTextComponent, "value"> & { customId: CustomID };
+type TypedInputTextComponent<CustomID> = WithRequired<Discord.TextInputComponent, "value"> & { customId: CustomID };
 interface ModalElement<FormData> {
 	type: Discord.MessageComponentTypes.ActionRow;
 	components: [TypedInputTextComponent<keyof FormData>];

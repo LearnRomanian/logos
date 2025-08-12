@@ -35,24 +35,29 @@ async function handleAnswer(client: Client, interaction: Logos.Interaction): Pro
 
 		client.bot.helpers
 			.sendMessage(message.channelId, {
+				flags: Discord.MessageFlags.IsComponentV2,
 				messageReference: {
 					messageId: message.id,
 					channelId: message.channelId,
 					guildId: interaction.guildId,
 					failIfNotExists: false,
 				},
-				embeds: [
+				components: [
 					{
-						description: `– *${formData.answer}*`,
-						color: constants.colours.success,
-						footer: {
-							text: `${constants.emojis.commands.answer} ${strings.submittedBy({
-								username: client.diagnostics.user(interaction.user),
-							})}`,
-							iconUrl: Discord.avatarUrl(interaction.user.id, interaction.user.discriminator, {
-								avatar: interaction.user.avatar,
-							}),
-						},
+						type: Discord.MessageComponentTypes.Container,
+						accentColor: constants.colours.success,
+						components: [
+							{
+								type: Discord.MessageComponentTypes.TextDisplay,
+								content: `– *${formData.answer}*`,
+							},
+							{
+								type: Discord.MessageComponentTypes.TextDisplay,
+								content: `-# ${constants.emojis.commands.answer} ${strings.submittedBy({
+									username: interaction.member?.nick ?? interaction.user.username,
+								})}`,
+							},
+						],
 					},
 				],
 			})

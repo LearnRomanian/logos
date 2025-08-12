@@ -53,7 +53,7 @@
     "db:rollback": "bun run database:migrate --rollback"
   },
   "dependencies": {
-    "@discordeno/bot": "^21.0.0",
+    "@discordeno/bot": "21.0.1-next.3b4cdf6",
     "@vxern/eld": "^1.1.0",
     "cldpre": "^2.9.0",
     "dexonline-scraper": "^0.2.3",

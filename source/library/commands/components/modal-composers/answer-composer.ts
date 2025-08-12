@@ -25,7 +25,7 @@ class AnswerComposer extends ModalComposer<AnswerFormData, never> {
 					components: [
 						{
 							customId: "question",
-							type: Discord.MessageComponentTypes.InputText,
+							type: Discord.MessageComponentTypes.TextInput,
 							label: trim(strings.fields.question, 45),
 							style: Discord.TextStyles.Paragraph,
 							required: false,
@@ -38,7 +38,7 @@ class AnswerComposer extends ModalComposer<AnswerFormData, never> {
 					components: [
 						{
 							customId: "answer",
-							type: Discord.MessageComponentTypes.InputText,
+							type: Discord.MessageComponentTypes.TextInput,
 							label: trim(strings.fields.answer, 45),
 							style: Discord.TextStyles.Paragraph,
 							required: true,

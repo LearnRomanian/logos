@@ -85,27 +85,35 @@ class InteractionRepetitionService extends GlobalService {
 		});
 		this.client
 			.pushedBack(buttonPress, {
-				embeds: [
-					{
-						title: strings.title,
-						description: strings.description,
-					},
-				],
+				flags: Discord.MessageFlags.IsComponentV2,
 				components: [
 					{
-						type: Discord.MessageComponentTypes.ActionRow,
+						type: Discord.MessageComponentTypes.Container,
 						components: [
 							{
-								type: Discord.MessageComponentTypes.Button,
-								customId: confirmButton.customId,
-								label: strings.yes,
-								style: Discord.ButtonStyles.Success,
+								type: Discord.MessageComponentTypes.TextDisplay,
+								content: `# ${strings.title}\n${strings.description}`,
 							},
 							{
-								type: Discord.MessageComponentTypes.Button,
-								customId: cancelButton.customId,
-								label: strings.no,
-								style: Discord.ButtonStyles.Danger,
+								type: Discord.MessageComponentTypes.Separator,
+								spacing: Discord.SeparatorSpacingSize.Large,
+							},
+							{
+								type: Discord.MessageComponentTypes.ActionRow,
+								components: [
+									{
+										type: Discord.MessageComponentTypes.Button,
+										customId: confirmButton.customId,
+										label: strings.yes,
+										style: Discord.ButtonStyles.Success,
+									},
+									{
+										type: Discord.MessageComponentTypes.Button,
+										customId: cancelButton.customId,
+										label: strings.no,
+										style: Discord.ButtonStyles.Danger,
+									},
+								],
 							},
 						],
 					},

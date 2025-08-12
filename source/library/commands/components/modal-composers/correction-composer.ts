@@ -39,7 +39,7 @@ class CorrectionComposer extends ModalComposer<CorrectionFormData, ValidationErr
 					components: [
 						{
 							customId: "original",
-							type: Discord.MessageComponentTypes.InputText,
+							type: Discord.MessageComponentTypes.TextInput,
 							label: trim(strings.fields.original, 45),
 							style: Discord.TextStyles.Paragraph,
 							required: false,
@@ -52,7 +52,7 @@ class CorrectionComposer extends ModalComposer<CorrectionFormData, ValidationErr
 					components: [
 						{
 							customId: "corrected",
-							type: Discord.MessageComponentTypes.InputText,
+							type: Discord.MessageComponentTypes.TextInput,
 							label: trim(strings.fields.corrected, 45),
 							style: Discord.TextStyles.Paragraph,
 							required: true,
