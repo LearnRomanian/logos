@@ -12,7 +12,24 @@ async function handleStartGame(client: Client, interaction: Logos.Interaction): 
 			locale: interaction.locale,
 		});
 		client
-			.warning(interaction, { title: strings.title, description: strings.description }, { autoDelete: true })
+			.warning(
+				interaction,
+				{
+					flags: Discord.MessageFlags.IsComponentV2,
+					components: [
+						{
+							type: Discord.MessageComponentTypes.Container,
+							components: [
+								{
+									type: Discord.MessageComponentTypes.TextDisplay,
+									content: `# ${strings.title}\n${strings.description}`,
+								},
+							],
+						},
+					],
+				},
+				{ autoDelete: true },
+			)
 			.ignore();
 
 		return;
