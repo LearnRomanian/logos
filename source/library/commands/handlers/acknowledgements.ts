@@ -4,7 +4,7 @@ async function handleDisplayAcknowledgements(client: Client, interaction: Logos.
 	const fields = constants.acknowledgements.map((acknowledgement) => {
 		const contributorsFormatted = acknowledgement.users.map((contributor) => contributor.username).join(", ");
 
-		return `### ${contributorsFormatted}:\n${acknowledgement.reason}`;
+		return `### ${contributorsFormatted}\n${acknowledgement.reason}`;
 	});
 
 	const strings = constants.contexts.acknowledgements({ localise: client.localise, locale: interaction.locale });
