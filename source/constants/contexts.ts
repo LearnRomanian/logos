@@ -375,11 +375,9 @@ export default Object.freeze({
 		description: localise("settings.strings.invalid.description", locale)(),
 	}),
 	likelyMatch: ({ localise, locale }) => ({
-		title: localise("recognise.strings.fields.likelyMatches.title", locale)(),
 		description: localise("recognise.strings.fields.likelyMatches.description.single", locale),
 	}),
 	likelyMatches: ({ localise, locale }) => ({
-		title: localise("recognise.strings.fields.likelyMatches.title", locale)(),
 		description: localise("recognise.strings.fields.likelyMatches.description.multiple", locale)(),
 	}),
 	thinking: ({ localise, locale }) => ({
@@ -392,11 +390,9 @@ export default Object.freeze({
 		language: (language: Language) => localise(constants.localisations.languages[language], locale)(),
 	}),
 	possibleMatch: ({ localise, locale }) => ({
-		title: localise("recognise.strings.fields.possibleMatches.title", locale)(),
 		description: localise("recognise.strings.fields.possibleMatches.description.single", locale),
 	}),
 	possibleMatches: ({ localise, locale }) => ({
-		title: localise("recognise.strings.fields.possibleMatches.title", locale)(),
 		description: localise("recognise.strings.fields.possibleMatches.description.multiple", locale)(),
 	}),
 	redirect: ({ localise, locale }) => ({
