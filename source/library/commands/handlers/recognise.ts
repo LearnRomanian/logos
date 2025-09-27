@@ -21,7 +21,22 @@ async function handleRecogniseLanguageMessage(client: Client, interaction: Logos
 			localise: client.localise,
 			locale: interaction.locale,
 		});
-		client.warning(interaction, { title: strings.title, description: strings.description }).ignore();
+		client
+			.warning(interaction, {
+				flags: Discord.MessageFlags.IsComponentV2,
+				components: [
+					{
+						type: Discord.MessageComponentTypes.Container,
+						components: [
+							{
+								type: Discord.MessageComponentTypes.TextDisplay,
+								content: `# ${strings.title}\n${strings.description}`,
+							},
+						],
+					},
+				],
+			})
+			.ignore();
 
 		return;
 	}
@@ -37,7 +52,22 @@ async function handleRecogniseLanguage(
 	const isTextEmpty = text.trim().length === 0;
 	if (isTextEmpty) {
 		const strings = constants.contexts.textEmpty({ localise: client.localise, locale: interaction.locale });
-		client.warning(interaction, { title: strings.title, description: strings.description }).ignore();
+		client
+			.warning(interaction, {
+				flags: Discord.MessageFlags.IsComponentV2,
+				components: [
+					{
+						type: Discord.MessageComponentTypes.Container,
+						components: [
+							{
+								type: Discord.MessageComponentTypes.TextDisplay,
+								content: `# ${strings.title}\n${strings.description}`,
+							},
+						],
+					},
+				],
+			})
+			.ignore();
 
 		return;
 	}
@@ -49,8 +79,18 @@ async function handleRecogniseLanguage(
 		const strings = constants.contexts.unknownLanguage({ localise: client.localise, locale: interaction.locale });
 		client
 			.unsupported(interaction, {
-				title: strings.title,
-				description: isMessage ? strings.description.message : strings.description.text,
+				flags: Discord.MessageFlags.IsComponentV2,
+				components: [
+					{
+						type: Discord.MessageComponentTypes.Container,
+						components: [
+							{
+								type: Discord.MessageComponentTypes.TextDisplay,
+								content: `# ${strings.title}\n${isMessage ? strings.description.message : strings.description.text}`,
+							},
+						],
+					},
+				],
 			})
 			.ignore();
 
@@ -73,15 +113,20 @@ async function handleRecogniseLanguage(
 		};
 		client
 			.noticed(interaction, {
-				embeds: [
-					{
-						description: `> *${text}*\n\n${strings.description({ language: strings.language(language) })}`,
-					},
-				],
+				flags: Discord.MessageFlags.IsComponentV2,
 				components: [
 					{
-						type: Discord.MessageComponentTypes.ActionRow,
-						components: [sourceNotice.button],
+						type: Discord.MessageComponentTypes.Container,
+						components: [
+							{
+								type: Discord.MessageComponentTypes.TextDisplay,
+								content: `> *${text}*\n${strings.description({ language: strings.language(language) })}`,
+							},
+							{
+								type: Discord.MessageComponentTypes.ActionRow,
+								components: [sourceNotice.button],
+							},
+						],
 					},
 				],
 			})
@@ -90,86 +135,85 @@ async function handleRecogniseLanguage(
 		return;
 	}
 
-	{
-		const fields: Discord.Camelize<Discord.DiscordEmbedField>[] = [];
+	const components: Discord.TextDisplayComponent[] = [];
 
-		if (detections.likely.length === 1) {
-			const language = detections.likely.at(0);
-			if (language === undefined) {
-				throw new Error("Likely detected language unexpectedly undefined.");
-			}
-
-			const strings = {
-				...constants.contexts.likelyMatch({ localise: client.localise, locale: interaction.locale }),
-				...constants.contexts.language({ localise: client.localise, locale: interaction.locale }),
-			};
-			fields.push({
-				name: `${constants.emojis.commands.recognise.likely} ${strings.title}`,
-				value: strings.description({ language: `**${strings.language(language)}**` }),
-				inline: false,
-			});
-		} else if (detections.likely.length > 0) {
-			const strings = {
-				...constants.contexts.likelyMatches({ localise: client.localise, locale: interaction.locale }),
-				...constants.contexts.language({ localise: client.localise, locale: interaction.locale }),
-			};
-			const languageNamesLocalised = detections.likely.map((language) => strings.language(language));
-			const languageNamesFormatted = list(languageNamesLocalised.map((languageName) => `***${languageName}***`));
-
-			fields.push({
-				name: `${constants.emojis.commands.recognise.likely} ${strings.title}`,
-				value: `${strings.description}\n${languageNamesFormatted}`,
-				inline: false,
-			});
+	if (detections.likely.length === 1) {
+		const language = detections.likely.at(0);
+		if (language === undefined) {
+			throw new Error("Likely detected language unexpectedly undefined.");
 		}
 
-		if (detections.possible.length === 1) {
-			const language = detections.possible.at(0);
-			if (language === undefined) {
-				throw new Error("Possible detected language unexpectedly undefined.");
-			}
+		const strings = {
+			...constants.contexts.likelyMatch({ localise: client.localise, locale: interaction.locale }),
+			...constants.contexts.language({ localise: client.localise, locale: interaction.locale }),
+		};
+		components.push({
+			type: Discord.MessageComponentTypes.TextDisplay,
+			content: strings.description({ language: `**${strings.language(language)}**` }),
+		});
+	} else if (detections.likely.length > 0) {
+		const strings = {
+			...constants.contexts.likelyMatches({ localise: client.localise, locale: interaction.locale }),
+			...constants.contexts.language({ localise: client.localise, locale: interaction.locale }),
+		};
+		const languageNamesLocalised = detections.likely.map((language) => strings.language(language));
+		const languageNamesFormatted = list(languageNamesLocalised.map((languageName) => `***${languageName}***`));
 
-			const strings = {
-				...constants.contexts.possibleMatch({ localise: client.localise, locale: interaction.locale }),
-				...constants.contexts.language({ localise: client.localise, locale: interaction.locale }),
-			};
-			fields.push({
-				name: `${constants.emojis.commands.recognise.possible} ${strings.title}`,
-				value: strings.description({ language: `**${strings.language(language)}**` }),
-				inline: false,
-			});
-		} else if (detections.possible.length > 0) {
-			const strings = {
-				...constants.contexts.possibleMatches({ localise: client.localise, locale: interaction.locale }),
-				...constants.contexts.language({ localise: client.localise, locale: interaction.locale }),
-			};
-			const languageNamesLocalised = detections.possible.map((language) => strings.language(language));
-			const languageNamesFormatted = list(languageNamesLocalised.map((languageName) => `***${languageName}***`));
-
-			fields.push({
-				name: `${constants.emojis.commands.recognise.possible} ${strings.title}`,
-				value: `${strings.description}\n${languageNamesFormatted}`,
-				inline: false,
-			});
-		}
-
-		client
-			.noticed(interaction, {
-				embeds: [
-					{
-						description: `> *${text}*\n\n`,
-						fields,
-					},
-				],
-				components: [
-					{
-						type: Discord.MessageComponentTypes.ActionRow,
-						components: [sourceNotice.button],
-					},
-				],
-			})
-			.ignore();
+		components.push({
+			type: Discord.MessageComponentTypes.TextDisplay,
+			content: `${strings.description}\n${languageNamesFormatted}`,
+		});
 	}
+
+	if (detections.possible.length === 1) {
+		const language = detections.possible.at(0);
+		if (language === undefined) {
+			throw new Error("Possible detected language unexpectedly undefined.");
+		}
+
+		const strings = {
+			...constants.contexts.possibleMatch({ localise: client.localise, locale: interaction.locale }),
+			...constants.contexts.language({ localise: client.localise, locale: interaction.locale }),
+		};
+		components.push({
+			type: Discord.MessageComponentTypes.TextDisplay,
+			content: strings.description({ language: `**${strings.language(language)}**` }),
+		});
+	} else if (detections.possible.length > 0) {
+		const strings = {
+			...constants.contexts.possibleMatches({ localise: client.localise, locale: interaction.locale }),
+			...constants.contexts.language({ localise: client.localise, locale: interaction.locale }),
+		};
+		const languageNamesLocalised = detections.possible.map((language) => strings.language(language));
+		const languageNamesFormatted = list(languageNamesLocalised.map((languageName) => `***${languageName}***`));
+
+		components.push({
+			type: Discord.MessageComponentTypes.TextDisplay,
+			content: `${strings.description}\n${languageNamesFormatted}`,
+		});
+	}
+
+	client
+		.noticed(interaction, {
+			flags: Discord.MessageFlags.IsComponentV2,
+			components: [
+				{
+					type: Discord.MessageComponentTypes.Container,
+					components: [
+						{
+							type: Discord.MessageComponentTypes.TextDisplay,
+							content: `> *${text}*`,
+						},
+						...components,
+						{
+							type: Discord.MessageComponentTypes.ActionRow,
+							components: [sourceNotice.button],
+						},
+					],
+				},
+			],
+		})
+		.ignore();
 }
 
 export { handleRecogniseLanguageChatInput, handleRecogniseLanguageMessage };

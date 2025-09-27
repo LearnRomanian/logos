@@ -36,7 +36,22 @@ async function handleTranslateMessage(client: Client, interaction: Logos.Interac
 			localise: client.localise,
 			locale: interaction.locale,
 		});
-		client.warning(interaction, { title: strings.title, description: strings.description }).ignore();
+		client
+			.warning(interaction, {
+				flags: Discord.MessageFlags.IsComponentV2,
+				components: [
+					{
+						type: Discord.MessageComponentTypes.Container,
+						components: [
+							{
+								type: Discord.MessageComponentTypes.TextDisplay,
+								content: `# ${strings.title}\n${strings.description}`,
+							},
+						],
+					},
+				],
+			})
+			.ignore();
 
 		return;
 	}
@@ -57,7 +72,22 @@ async function handleTranslate(
 			localise: client.localise,
 			locale: interaction.locale,
 		});
-		client.error(interaction, { title: strings.title, description: strings.description }).ignore();
+		client
+			.error(interaction, {
+				flags: Discord.MessageFlags.IsComponentV2,
+				components: [
+					{
+						type: Discord.MessageComponentTypes.Container,
+						components: [
+							{
+								type: Discord.MessageComponentTypes.TextDisplay,
+								content: `# ${strings.title}\n${strings.description}`,
+							},
+						],
+					},
+				],
+			})
+			.ignore();
 
 		return;
 	}
@@ -73,7 +103,22 @@ async function handleTranslate(
 				localise: client.localise,
 				locale: interaction.locale,
 			});
-			client.error(interaction, { title: strings.title, description: strings.description }).ignore();
+			client
+				.error(interaction, {
+					flags: Discord.MessageFlags.IsComponentV2,
+					components: [
+						{
+							type: Discord.MessageComponentTypes.Container,
+							components: [
+								{
+									type: Discord.MessageComponentTypes.TextDisplay,
+									content: `# ${strings.title}\n${strings.description}`,
+								},
+							],
+						},
+					],
+				})
+				.ignore();
 
 			return;
 		}
@@ -83,7 +128,22 @@ async function handleTranslate(
 				localise: client.localise,
 				locale: interaction.locale,
 			});
-			client.error(interaction, { title: strings.title, description: strings.description }).ignore();
+			client
+				.error(interaction, {
+					flags: Discord.MessageFlags.IsComponentV2,
+					components: [
+						{
+							type: Discord.MessageComponentTypes.Container,
+							components: [
+								{
+									type: Discord.MessageComponentTypes.TextDisplay,
+									content: `# ${strings.title}\n${strings.description}`,
+								},
+							],
+						},
+					],
+				})
+				.ignore();
 
 			return;
 		}
@@ -93,7 +153,22 @@ async function handleTranslate(
 				localise: client.localise,
 				locale: interaction.locale,
 			});
-			client.error(interaction, { title: strings.title, description: strings.description }).ignore();
+			client
+				.error(interaction, {
+					flags: Discord.MessageFlags.IsComponentV2,
+					components: [
+						{
+							type: Discord.MessageComponentTypes.Container,
+							components: [
+								{
+									type: Discord.MessageComponentTypes.TextDisplay,
+									content: `# ${strings.title}\n${strings.description}`,
+								},
+							],
+						},
+					],
+				})
+				.ignore();
 
 			return;
 		}
@@ -104,7 +179,22 @@ async function handleTranslate(
 					localise: client.localise,
 					locale: interaction.locale,
 				});
-				client.pushback(interaction, { title: strings.title, description: strings.description }).ignore();
+				client
+					.pushback(interaction, {
+						flags: Discord.MessageFlags.IsComponentV2,
+						components: [
+							{
+								type: Discord.MessageComponentTypes.Container,
+								components: [
+									{
+										type: Discord.MessageComponentTypes.TextDisplay,
+										content: `# ${strings.title}\n${strings.description}`,
+									},
+								],
+							},
+						],
+					})
+					.ignore();
 
 				return;
 			}
@@ -155,8 +245,18 @@ async function handleTranslate(
 		});
 		client
 			.warning(interaction, {
-				title: strings.title,
-				description: `${strings.description.cannotDetermine}\n\n${strings.description.tryAgain}`,
+				flags: Discord.MessageFlags.IsComponentV2,
+				components: [
+					{
+						type: Discord.MessageComponentTypes.Container,
+						components: [
+							{
+								type: Discord.MessageComponentTypes.TextDisplay,
+								content: `# ${strings.title}\n${strings.description.cannotDetermine}\n\n${strings.description.tryAgain}`,
+							},
+						],
+					},
+				],
 			})
 			.ignore();
 
@@ -170,8 +270,18 @@ async function handleTranslate(
 		});
 		client
 			.warning(interaction, {
-				title: strings.title,
-				description: `${strings.description.cannotDetermine}\n\n${strings.description.tryAgain}`,
+				flags: Discord.MessageFlags.IsComponentV2,
+				components: [
+					{
+						type: Discord.MessageComponentTypes.Container,
+						components: [
+							{
+								type: Discord.MessageComponentTypes.TextDisplay,
+								content: `# ${strings.title}\n${strings.description.cannotDetermine}\n\n${strings.description.tryAgain}`,
+							},
+						],
+					},
+				],
 			})
 			.ignore();
 
@@ -195,7 +305,22 @@ async function translateText(
 			localise: client.localise,
 			locale: interaction.locale,
 		});
-		client.unsupported(interaction, { title: strings.title, description: strings.description }).ignore();
+		client
+			.unsupported(interaction, {
+				flags: Discord.MessageFlags.IsComponentV2,
+				components: [
+					{
+						type: Discord.MessageComponentTypes.Container,
+						components: [
+							{
+								type: Discord.MessageComponentTypes.TextDisplay,
+								content: `# ${strings.title}\n${strings.description}`,
+							},
+						],
+					},
+				],
+			})
+			.ignore();
 
 		return;
 	}
@@ -215,7 +340,22 @@ async function translateText(
 
 	if (translation === undefined) {
 		const strings = constants.contexts.failedToTranslate({ localise: client.localise, locale: interaction.locale });
-		client.failed(interaction, { title: strings.title, description: strings.description }).ignore();
+		client
+			.failed(interaction, {
+				flags: Discord.MessageFlags.IsComponentV2,
+				components: [
+					{
+						type: Discord.MessageComponentTypes.Container,
+						components: [
+							{
+								type: Discord.MessageComponentTypes.TextDisplay,
+								content: `# ${strings.title}\n${strings.description}`,
+							},
+						],
+					},
+				],
+			})
+			.ignore();
 
 		return;
 	}
@@ -223,8 +363,6 @@ async function translateText(
 	// Ensures that an empty translation string does not result in embed failure.
 	const translatedText =
 		translation.text.trim().length > 0 ? translation.text : constants.special.meta.forcedWhitespace;
-
-	const isLong = text.length > 896; // 7/8 of 1024. Leaves room for text overhead.
 
 	const strings = {
 		...constants.contexts.translation({ localise: client.localise, locale: interaction.locale }),
@@ -239,56 +377,43 @@ async function translateText(
 		constants.emojis.commands.translate.direction
 	} ${targetLanguageFlag} ${targetLanguageName}`;
 
-	let embeds: Discord.Camelize<Discord.DiscordEmbed>[];
-	if (isLong) {
-		embeds = [
-			{
-				title: strings.sourceText,
-				description: text,
-			},
-			{
-				title: strings.translation,
-				description: translatedText,
-				footer: { text: footerText },
-			},
-		];
-	} else {
-		embeds = [
-			{
-				fields: [
-					{
-						name: strings.sourceText,
-						value: text,
-						inline: false,
-					},
-					{
-						name: strings.translation,
-						value: translatedText,
-						inline: false,
-					},
-				],
-				footer: { text: footerText },
-			},
-		];
-	}
-
 	const sourceNotice = new TranslationSourceNotice(client, { interaction, source: translation.source });
 
 	await sourceNotice.register();
 
-	const components: Discord.ActionRow[] = [
-		{
-			type: Discord.MessageComponentTypes.ActionRow,
+	client
+		.noticed(interaction, {
+			flags: Discord.MessageFlags.IsComponentV2,
 			components: [
-				...(interaction.parameters.show
-					? []
-					: [client.services.global("interactionRepetition").getShowButton(interaction)]),
-				sourceNotice.button,
-			] as [Discord.ButtonComponent],
-		},
-	];
-
-	client.noticed(interaction, { embeds, components }).ignore();
+				{
+					type: Discord.MessageComponentTypes.Container,
+					components: [
+						{
+							type: Discord.MessageComponentTypes.TextDisplay,
+							content: `### ${strings.sourceText}\n${text}`,
+						},
+						{
+							type: Discord.MessageComponentTypes.TextDisplay,
+							content: `### ${strings.translation}\n${translatedText}`,
+						},
+						{
+							type: Discord.MessageComponentTypes.ActionRow,
+							components: [
+								...(interaction.parameters.show
+									? []
+									: [client.services.global("interactionRepetition").getShowButton(interaction)]),
+								sourceNotice.button,
+							],
+						},
+						{
+							type: Discord.MessageComponentTypes.TextDisplay,
+							content: `-# ${footerText}`,
+						},
+					],
+				},
+			],
+		})
+		.ignore();
 }
 
 async function detectLanguage(
@@ -305,8 +430,18 @@ async function detectLanguage(
 		});
 		client
 			.warning(interaction, {
-				title: strings.title,
-				description: `${strings.description.cannotDetermine}\n\n${strings.description.tryAgain}`,
+				flags: Discord.MessageFlags.IsComponentV2,
+				components: [
+					{
+						type: Discord.MessageComponentTypes.Container,
+						components: [
+							{
+								type: Discord.MessageComponentTypes.TextDisplay,
+								content: `# ${strings.title}\n${strings.description.cannotDetermine}\n\n${strings.description.tryAgain}`,
+							},
+						],
+					},
+				],
 			})
 			.ignore();
 
@@ -321,8 +456,18 @@ async function detectLanguage(
 		};
 		client
 			.unsupported(interaction, {
-				title: strings.title,
-				description: strings.description({ language: strings.language(detectedLanguage) }),
+				flags: Discord.MessageFlags.IsComponentV2,
+				components: [
+					{
+						type: Discord.MessageComponentTypes.Container,
+						components: [
+							{
+								type: Discord.MessageComponentTypes.TextDisplay,
+								content: `# ${strings.title}\n${strings.description({ language: strings.language(detectedLanguage) })}`,
+							},
+						],
+					},
+				],
 			})
 			.ignore();
 

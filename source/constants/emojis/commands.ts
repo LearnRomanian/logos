@@ -9,7 +9,7 @@ export default Object.freeze({
 				games: "🎮",
 				messages: "✍️",
 				guides: "🎓",
-				languages: "🌍",
+				languages: "🇬🇧",
 			},
 		},
 		guild: {

@@ -102,79 +102,83 @@ class GameViewComponent {
 		});
 		const mask = constants.special.game.mask.repeat(this.sentenceSelection.correctPick[1].length);
 
+		const title =
+			mode === "reveal"
+				? this.sentenceSelection.sentencePair.sentence.replaceAll(
+						wholeWordPattern,
+						`__${this.sentenceSelection.correctPick[1]}__`,
+					)
+				: this.sentenceSelection.sentencePair.sentence.replaceAll(wholeWordPattern, mask);
+		const selectionButtons: Discord.ButtonComponent[] = this.sentenceSelection.allPicks.map((pick) => {
+			let style: Discord.ButtonStyles;
+			if (mode === "hide") {
+				style = Discord.ButtonStyles.Primary;
+			} else {
+				const isCorrect = pick[0] === this.sentenceSelection.correctPick[0];
+				if (isCorrect) {
+					style = Discord.ButtonStyles.Success;
+				} else {
+					style = Discord.ButtonStyles.Danger;
+				}
+			}
+
+			let customId: string;
+			if (mode === "hide") {
+				customId = this.#guesses.encodeId([pick[0].toString()]);
+			} else {
+				customId = InteractionCollector.encodeCustomId([InteractionCollector.noneId, pick[0].toString()]);
+			}
+
+			return {
+				type: Discord.MessageComponentTypes.Button,
+				style,
+				disabled: mode === "reveal",
+				label: pick[1],
+				customId,
+			};
+		});
 		const strings = constants.contexts.game({ localise: this.#client.localise, locale: this.#interaction.locale });
+		const nextOrSkipButton: Discord.ButtonComponent =
+			mode === "reveal"
+				? {
+						type: Discord.MessageComponentTypes.Button,
+						style: Discord.ButtonStyles.Primary,
+						label: `${constants.emojis.interactions.menu.controls.forward} ${strings.next}`,
+						customId: this.#skips.encodeId([]),
+					}
+				: {
+						type: Discord.MessageComponentTypes.Button,
+						style: Discord.ButtonStyles.Secondary,
+						label: `${constants.emojis.interactions.menu.controls.forward} ${strings.skip}`,
+						customId: this.#skips.encodeId([]),
+					};
+
 		return {
-			embeds: [
-				{
-					title:
-						mode === "reveal"
-							? this.sentenceSelection.sentencePair.sentence.replaceAll(
-									wholeWordPattern,
-									`__${this.sentenceSelection.correctPick[1]}__`,
-								)
-							: this.sentenceSelection.sentencePair.sentence.replaceAll(wholeWordPattern, mask),
-					description: this.sentenceSelection.sentencePair.translation,
-					color: this.embedColour,
-					footer: {
-						text: `${strings.correctGuesses({ number: this.sessionScore })} · ${strings.allTime({
-							number: totalScore,
-						})}`,
-					},
-				},
-			],
+			flags: Discord.MessageFlags.IsComponentV2,
 			components: [
 				{
-					type: Discord.MessageComponentTypes.ActionRow,
-					components: this.sentenceSelection.allPicks.map((pick) => {
-						let style: Discord.ButtonStyles;
-						if (mode === "hide") {
-							style = Discord.ButtonStyles.Primary;
-						} else {
-							const isCorrect = pick[0] === this.sentenceSelection.correctPick[0];
-							if (isCorrect) {
-								style = Discord.ButtonStyles.Success;
-							} else {
-								style = Discord.ButtonStyles.Danger;
-							}
-						}
-
-						let customId: string;
-						if (mode === "hide") {
-							customId = this.#guesses.encodeId([pick[0].toString()]);
-						} else {
-							customId = InteractionCollector.encodeCustomId([
-								InteractionCollector.noneId,
-								pick[0].toString(),
-							]);
-						}
-
-						return {
-							type: Discord.MessageComponentTypes.Button,
-							style,
-							disabled: mode === "reveal",
-							label: pick[1],
-							customId,
-						};
-					}) as [Discord.ButtonComponent],
-				},
-				{
-					type: Discord.MessageComponentTypes.ActionRow,
+					type: Discord.MessageComponentTypes.Container,
+					accentColor: this.embedColour,
 					components: [
-						mode === "reveal"
-							? {
-									type: Discord.MessageComponentTypes.Button,
-									style: Discord.ButtonStyles.Primary,
-									label: `${constants.emojis.interactions.menu.controls.forward} ${strings.next}`,
-									customId: this.#skips.encodeId([]),
-								}
-							: {
-									type: Discord.MessageComponentTypes.Button,
-									style: Discord.ButtonStyles.Secondary,
-									label: `${constants.emojis.interactions.menu.controls.forward} ${strings.skip}`,
-									customId: this.#skips.encodeId([]),
-								},
-						sourceNotice.button,
-					] as [Discord.ButtonComponent, Discord.ButtonComponent],
+						{
+							type: Discord.MessageComponentTypes.TextDisplay,
+							content: `# ${title}\n${this.sentenceSelection.sentencePair.translation}`,
+						},
+						{
+							type: Discord.MessageComponentTypes.ActionRow,
+							components: selectionButtons,
+						},
+						{
+							type: Discord.MessageComponentTypes.ActionRow,
+							components: [nextOrSkipButton, sourceNotice.button],
+						},
+						{
+							type: Discord.MessageComponentTypes.TextDisplay,
+							content: `-# ${strings.correctGuesses({ number: this.sessionScore })} · ${strings.allTime({
+								number: totalScore,
+							})}`,
+						},
+					],
 				},
 			],
 		};

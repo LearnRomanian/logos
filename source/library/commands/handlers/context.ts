@@ -27,7 +27,21 @@ async function handleFindInContext(
 ): Promise<void> {
 	if (interaction.parameters.language !== undefined && !isLocalisationLanguage(interaction.parameters.language)) {
 		const strings = constants.contexts.invalidLanguage({ localise: client.localise, locale: interaction.locale });
-		client.error(interaction, { title: strings.title, description: strings.description }).ignore();
+		client
+			.error(interaction, {
+				components: [
+					{
+						type: Discord.MessageComponentTypes.Container,
+						components: [
+							{
+								type: Discord.MessageComponentTypes.TextDisplay,
+								content: `# ${strings.title}\n${strings.description}`,
+							},
+						],
+					},
+				],
+			})
+			.ignore();
 
 		return;
 	}
@@ -52,7 +66,24 @@ async function handleFindInContext(
 			locale: interaction.displayLocale,
 		});
 		client
-			.warned(interaction, { title: strings.title, description: strings.description }, { autoDelete: true })
+			.warned(
+				interaction,
+				{
+					flags: Discord.MessageFlags.IsComponentV2,
+					components: [
+						{
+							type: Discord.MessageComponentTypes.Container,
+							components: [
+								{
+									type: Discord.MessageComponentTypes.TextDisplay,
+									content: `# ${strings.title}\n${strings.description}`,
+								},
+							],
+						},
+					],
+				},
+				{ autoDelete: true },
+			)
 			.ignore();
 
 		return;
@@ -92,32 +123,38 @@ async function handleFindInContext(
 
 	client
 		.noticed(interaction, {
-			embeds: [
-				{
-					title: strings.title({ phrase: interaction.parameters.phrase }),
-					fields: sentencePairSelection.map((sentencePair) => {
-						let sentenceFormatted = sentencePair.sentence;
-						for (const [lemma, pattern] of lemmaPatterns) {
-							sentenceFormatted = sentenceFormatted.replaceAll(pattern, `__${lemma}__`);
-						}
-
-						return {
-							name: sentenceFormatted,
-							value: `> ${sentencePair.translation}`,
-						};
-					}),
-					footer: { text: `${languageFlag} ${languageName}` },
-				},
-			],
+			flags: Discord.MessageFlags.IsComponentV2,
 			components: [
 				{
-					type: Discord.MessageComponentTypes.ActionRow,
+					type: Discord.MessageComponentTypes.Container,
 					components: [
-						...(interaction.parameters.show
-							? []
-							: [client.services.global("interactionRepetition").getShowButton(interaction)]),
-						sourceNotice.button,
-					] as [Discord.ButtonComponent],
+						{
+							type: Discord.MessageComponentTypes.TextDisplay,
+							content: `# ${strings.title({ phrase: interaction.parameters.phrase })}\n${sentencePairSelection
+								.map((sentencePair) => {
+									let sentenceFormatted = sentencePair.sentence;
+									for (const [lemma, pattern] of lemmaPatterns) {
+										sentenceFormatted = sentenceFormatted.replaceAll(pattern, `__${lemma}__`);
+									}
+
+									return `${sentenceFormatted}\n> ${sentencePair.translation}`;
+								})
+								.join("\n")}`,
+						},
+						{
+							type: Discord.MessageComponentTypes.ActionRow,
+							components: [
+								...(interaction.parameters.show
+									? []
+									: [client.services.global("interactionRepetition").getShowButton(interaction)]),
+								sourceNotice.button,
+							],
+						},
+						{
+							type: Discord.MessageComponentTypes.TextDisplay,
+							content: `-# ${languageFlag} ${languageName}`,
+						},
+					],
 				},
 			],
 		})
