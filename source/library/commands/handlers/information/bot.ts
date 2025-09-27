@@ -2,11 +2,6 @@ import { list } from "logos:constants/formatting";
 import type { Client } from "logos/client";
 
 async function handleDisplayBotInformation(client: Client, interaction: Logos.Interaction): Promise<void> {
-	const botUser = client.entities.users.get(client.bot.id);
-	if (botUser === undefined) {
-		return;
-	}
-
 	const strings = constants.contexts.botInformation({ localise: client.localise, locale: interaction.displayLocale });
 
 	const featuresFormatted = list([

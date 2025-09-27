@@ -12,7 +12,6 @@ type UserLike = Logos.User | Discord.User | Discord.Camelize<Discord.DiscordUser
 type MemberLike = Logos.Member | Discord.Member | Discord.Camelize<Discord.DiscordMember>;
 type RoleLike = Logos.Role | Discord.Role | Discord.Camelize<Discord.DiscordRole>;
 type GuildLike = Logos.Guild | Discord.Guild | Discord.Camelize<Discord.DiscordGuild>;
-type MessageLike = Logos.Message | Discord.Message | Discord.Camelize<Discord.DiscordMessage>;
 type ChannelLike = Logos.Channel | Discord.Channel | Discord.Camelize<Discord.DiscordChannel>;
 type InteractionLike = Logos.Interaction | Discord.Interaction;
 
@@ -23,18 +22,7 @@ class Diagnostics {
 		this.#client = client;
 	}
 
-	user(userOrId: IndexOr<UserLike>, options?: { prettify?: boolean }): string {
-		let user: UserLike;
-		if (isId(userOrId)) {
-			if (!this.#client.entities.users.has(BigInt(userOrId))) {
-				return `uncached user (ID ${userOrId})`;
-			}
-
-			user = this.#client.entities.users.get(BigInt(userOrId))!;
-		} else {
-			user = userOrId;
-		}
-
+	user(user: UserLike, options?: { prettify?: boolean }): string {
 		const tag = user.discriminator === "0" ? user.username : `${user.username}#${user.discriminator}`;
 
 		if (options?.prettify) {
@@ -48,8 +36,6 @@ class Diagnostics {
 		let userFormatted: string;
 		if (member.user !== undefined) {
 			userFormatted = this.user(member.user);
-		} else if ("id" in member) {
-			userFormatted = this.user(member.id);
 		} else {
 			userFormatted = "unknown user";
 		}
@@ -92,25 +78,6 @@ class Diagnostics {
 		}
 
 		return `guild "${guild.name}" (ID ${guild.id})`;
-	}
-
-	message(messageOrId: IndexOr<MessageLike>): string {
-		let message: MessageLike;
-		if (isId(messageOrId)) {
-			if (!this.#client.entities.messages.latest.has(BigInt(messageOrId))) {
-				return `uncached guild (ID ${messageOrId})`;
-			}
-
-			message = this.#client.entities.messages.latest.get(BigInt(messageOrId))!;
-		} else {
-			message = messageOrId;
-		}
-
-		const contentLength = message.content?.length ?? 0;
-		const embedCount = message.embeds?.length ?? 0;
-		const userFormatted = this.user(message.author.id);
-
-		return `message of length ${contentLength} with ${embedCount} embeds (ID ${message.id}) posted by ${userFormatted}`;
 	}
 
 	channel(channelOrId: IndexOr<ChannelLike>): string {
