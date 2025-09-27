@@ -20,11 +20,6 @@ async function handleMakeCorrection(
 ): Promise<void> {
 	const guildDocument = await Guild.getOrCreate(client, { guildId: interaction.guildId.toString() });
 
-	const member = client.entities.members.get(interaction.guildId)?.get(interaction.user.id);
-	if (member === undefined) {
-		return;
-	}
-
 	const message = interaction.data?.resolved?.messages?.array()?.at(0);
 	if (message === undefined) {
 		return;

@@ -210,8 +210,6 @@ class Client {
 		this.log.info("Setting up event collectors...");
 
 		this.#channelDeletes.onCollect((channel) => {
-			this.entities.channels.delete(channel.id);
-
 			if (channel.guildId !== undefined) {
 				this.entities.guilds.get(channel.guildId)?.channels?.delete(channel.id);
 			}

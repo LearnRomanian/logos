@@ -6,7 +6,7 @@ async function handleDisplayCredits(client: Client, interaction: Logos.Interacti
 	client.notice(interaction, getTranslationView(client, interaction)).ignore();
 }
 
-function getTranslationView(client: Client, interaction: Logos.Interaction): Discord.Camelize<Discord.DiscordEmbed> {
+function getTranslationView(client: Client, interaction: Logos.Interaction): Discord.InteractionCallbackData {
 	const fields: Discord.Camelize<Discord.DiscordEmbedField>[] = [];
 
 	const strings = {
@@ -34,7 +34,20 @@ function getTranslationView(client: Client, interaction: Logos.Interaction): Dis
 		});
 	}
 
-	return { title: strings.translation, fields };
+	return {
+		flags: Discord.MessageFlags.IsComponentV2,
+		components: [
+			{
+				type: Discord.MessageComponentTypes.Container,
+				components: [
+					{
+						type: Discord.MessageComponentTypes.TextDisplay,
+						content: `# ${strings.translation}\n\n${fields}`,
+					},
+				],
+			},
+		],
+	};
 }
 
 export { handleDisplayCredits };
