@@ -64,7 +64,7 @@ async function handleTranslate(
 	interaction: Logos.Interaction,
 	{ text, from, to }: { text: string; from?: string; to?: string },
 ): Promise<void> {
-	const language = interaction.parameters.show ? interaction.guildLanguage : interaction.language;
+	const language = interaction.displayLanguage;
 
 	const isTextEmpty = text.trim().length === 0;
 	if (isTextEmpty) {
