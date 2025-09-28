@@ -96,7 +96,7 @@ async function handleMakeCorrection(
 			return `${content}${part.value}`;
 		}, "");
 
-		const strings = constants.contexts.correction({ localise: client.localise, locale: interaction.locale });
+		const strings = constants.contexts.correction({ localise: client.localise, locale: interaction.displayLocale });
 		client.bot.helpers
 			.sendMessage(message.channelId, {
 				flags: Discord.MessageFlags.IsComponentV2,

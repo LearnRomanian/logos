@@ -56,7 +56,7 @@ class CefrGuideView extends TabbedView<{ groups: TabGroups }> {
 			case "a": {
 				const strings = constants.contexts.cefrGuideBracketA({
 					localise: this.client.localise,
-					locale: interaction.locale,
+					locale: interaction.displayLocale,
 				});
 
 				return {
@@ -77,7 +77,7 @@ class CefrGuideView extends TabbedView<{ groups: TabGroups }> {
 			case "b": {
 				const strings = constants.contexts.cefrGuideBracketB({
 					localise: this.client.localise,
-					locale: interaction.locale,
+					locale: interaction.displayLocale,
 				});
 
 				return {
@@ -98,7 +98,7 @@ class CefrGuideView extends TabbedView<{ groups: TabGroups }> {
 			case "c": {
 				const strings = constants.contexts.cefrGuideBracketC({
 					localise: this.client.localise,
-					locale: interaction.locale,
+					locale: interaction.displayLocale,
 				});
 
 				return {
@@ -129,7 +129,7 @@ class CefrGuideView extends TabbedView<{ groups: TabGroups }> {
 			case "a": {
 				const strings = constants.contexts.cefrExamplesBracketA({
 					localise: this.client.localise,
-					locale: interaction.locale,
+					locale: interaction.displayLocale,
 				});
 
 				return {
@@ -150,7 +150,7 @@ class CefrGuideView extends TabbedView<{ groups: TabGroups }> {
 			case "b": {
 				const strings = constants.contexts.cefrExamplesBracketB({
 					localise: this.client.localise,
-					locale: interaction.locale,
+					locale: interaction.displayLocale,
 				});
 
 				return {
@@ -171,7 +171,7 @@ class CefrGuideView extends TabbedView<{ groups: TabGroups }> {
 			case "c": {
 				const strings = constants.contexts.cefrExamplesBracketC({
 					localise: this.client.localise,
-					locale: interaction.locale,
+					locale: interaction.displayLocale,
 				});
 
 				return {
@@ -198,7 +198,7 @@ class CefrGuideView extends TabbedView<{ groups: TabGroups }> {
 	): Discord.ActionRow[] {
 		const strings = constants.contexts.cefrButtons({
 			localise: this.client.localise,
-			locale: interaction.locale,
+			locale: interaction.displayLocale,
 		});
 
 		return [

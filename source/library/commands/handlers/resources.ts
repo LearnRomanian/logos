@@ -9,11 +9,11 @@ async function handleDisplayResources(client: Client, interaction: Logos.Interac
 	const strings = {
 		...constants.contexts.redirect({
 			localise: client.localise,
-			locale: interaction.parameters.show ? interaction.guildLocale : interaction.locale,
+			locale: interaction.displayLocale,
 		}),
 		...constants.contexts.language({
 			localise: client.localise,
-			locale: interaction.parameters.show ? interaction.guildLocale : interaction.locale,
+			locale: interaction.displayLocale,
 		}),
 	};
 

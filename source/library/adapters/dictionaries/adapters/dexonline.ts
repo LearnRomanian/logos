@@ -203,7 +203,7 @@ class DexonlineAdapter extends DictionaryAdapter<Dexonline.Results> {
 
 		const strings = constants.contexts.dexonlinePronoun({
 			localise: this.client.localise.bind(this.client),
-			locale: interaction.parameters.show ? interaction.guildLocale : interaction.locale,
+			locale: interaction.displayLocale,
 		});
 		return {
 			tabs: [
@@ -253,7 +253,7 @@ class DexonlineAdapter extends DictionaryAdapter<Dexonline.Results> {
 
 		const strings = constants.contexts.dexonlineNoun({
 			localise: this.client.localise.bind(this.client),
-			locale: interaction.locale,
+			locale: interaction.displayLocale,
 		});
 		const numberColumn = {
 			name: constants.special.meta.forcedWhitespace,
@@ -361,7 +361,7 @@ class DexonlineAdapter extends DictionaryAdapter<Dexonline.Results> {
 
 		const strings = constants.contexts.dexonlineVerb({
 			localise: this.client.localise.bind(this.client),
-			locale: interaction.locale,
+			locale: interaction.displayLocale,
 		});
 		return {
 			tabs: [
@@ -528,7 +528,7 @@ class DexonlineAdapter extends DictionaryAdapter<Dexonline.Results> {
 
 		const strings = constants.contexts.dexonlineAdjective({
 			localise: this.client.localise.bind(this.client),
-			locale: interaction.locale,
+			locale: interaction.displayLocale,
 		});
 		return {
 			tabs: [
