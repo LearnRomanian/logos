@@ -1,6 +1,6 @@
 export default Object.freeze({
 	deepl: {
-		translate: "https://api.deepl.com/v2/translate",
+		translate: "https://api-free.deepl.com/v2/translate",
 	},
 	googleTranslate: {
 		host: "google-translator9.p.rapidapi.com",
