@@ -55,7 +55,7 @@ async function handleFindWord(
 		return;
 	}
 
-	await client.postponeReply(interaction, { visible: interaction.parameters.show });
+	await client.postponeReply(interaction, { visible: interaction.parameters.show, useLegacyComponents: true });
 
 	client.log.info(
 		`Looking up the word '${interaction.parameters.word}' from ${
