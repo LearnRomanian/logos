@@ -365,7 +365,11 @@ class InteractionStore {
 	 * ⚠️ Make sure you await postponed replies, otherwise you risk introducing race conditions where the bot attempts
 	 * to edit a reply before the postponing finishes.
 	 */
-	async postponeReply(interaction: Logos.Interaction, { visible = false } = {}): Promise<void> {
+	async postponeReply(
+		interaction: Logos.Interaction,
+		// TODO(vxern): Remove `useLegacyComponents` once migrated.
+		{ visible = false, useLegacyComponents = false } = {},
+	): Promise<void> {
 		this.#replies.set(interaction.token, { ephemeral: !visible });
 
 		if (interaction.parameters["@repeat"]) {
@@ -381,12 +385,30 @@ class InteractionStore {
 						guildId: interaction.guildId,
 						failIfNotExists: false,
 					},
-					embeds: [
-						{
-							description: strings.thinking,
-							color: constants.colours.notice,
-						},
-					],
+					...(useLegacyComponents
+						? {
+								embeds: [
+									{
+										description: strings.thinking,
+										color: constants.colours.notice,
+									},
+								],
+							}
+						: {
+								flags: Discord.MessageFlags.IsComponentV2,
+								components: [
+									{
+										type: Discord.MessageComponentTypes.Container,
+										accentColor: constants.colours.notice,
+										components: [
+											{
+												type: Discord.MessageComponentTypes.TextDisplay,
+												content: `**${strings.thinking}**`,
+											},
+										],
+									},
+								],
+							}),
 				})
 				.catch((error) => {
 					this.log.error(error, "Failed to postpone message reply to repeated interaction.");
