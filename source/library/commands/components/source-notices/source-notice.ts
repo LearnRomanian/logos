@@ -31,7 +31,7 @@ abstract class SourceNotice {
 		this.sources = sources;
 		this.notice = notice;
 
-		this.#buttonPresses = new InteractionCollector(client, { only: [interaction.user.id] });
+		this.#buttonPresses = new InteractionCollector(client, { only: [interaction.user.id], isPermanent: true });
 		this.#interaction = interaction;
 	}
 
