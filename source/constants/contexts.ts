@@ -285,10 +285,9 @@ export default Object.freeze({
 			},
 		},
 	}),
-	// TODO(vxern): This is needs to be changed because none of these string keys are relevant.
 	sureToCancel: ({ localise, locale }) => ({
-		title: localise("report.strings.sureToCancel.title", locale)(),
-		description: localise("report.strings.sureToCancel.description", locale)(),
+		title: localise("prompts.sureToCancel.title", locale)(),
+		description: localise("prompts.sureToCancel.description", locale)(),
 		stay: localise("prompts.stay", locale)(),
 		leave: localise("prompts.leave", locale)(),
 	}),

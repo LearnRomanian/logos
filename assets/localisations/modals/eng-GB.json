@@ -5,6 +5,8 @@
   "prompts.cancel": "Cancel",
   "prompts.stay": "Take me back",
   "prompts.leave": "Leave",
+  "prompts.sureToCancel.title": "Leave prompt?",
+  "prompts.sureToCancel.description": "Are you sure you want to discard the information you submitted and exit?",
   "answer.title": "Answer",
   "answer.fields.question": "Question",
   "answer.fields.answer": "Answer",
