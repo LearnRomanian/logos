@@ -32,7 +32,7 @@ class DiscordConnection {
 			events: eventHandlers,
 			transformers: { customizers: cacheHandlers },
 			handlers: {
-				// REMINDER(vxern): Remove this once Discordeno is able to filter out embeds being resolved in a message.
+				// TODO(vxern): Remove this once Discordeno is able to filter out embeds being resolved in a message.
 				MESSAGE_UPDATE: async (bot, data) => {
 					const message = data.d as Discord.DiscordMessage;
 					if (!message.author) {
