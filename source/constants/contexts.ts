@@ -573,5 +573,11 @@ export default Object.freeze({
 		title: localise("interactions.unauthorised.title", locale),
 		description: localise("interactions.unauthorised.description", locale),
 	}),
+	reloadBot: ({ localise, locale }) => ({
+		reloading: {
+			title: localise("maintenance.options.reload.options.bot.strings.reloading.title", locale),
+			description: localise("maintenance.options.reload.options.bot.strings.reloading.description", locale),
+		},
+	}),
 } satisfies Record<string, ContextBuilder<any>>);
 export type { ContextBuilder };

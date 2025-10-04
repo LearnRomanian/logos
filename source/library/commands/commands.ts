@@ -32,6 +32,7 @@ import {
 } from "logos/commands/handlers/translate";
 import { handleFindWord, handleFindWordAutocomplete } from "logos/commands/handlers/word";
 import { handleReloadGuild, handleReloadGuildAutocomplete } from "logos/commands/handlers/maintenance/reload/guild";
+import { handleReloadBot } from "logos/commands/handlers/maintenance/reload/bot";
 
 /**
  * @remarks
@@ -318,6 +319,11 @@ const commands = Object.freeze({
 								autocomplete: true,
 							},
 						},
+					},
+					bot: {
+						identifier: "bot",
+						type: Discord.ApplicationCommandOptionTypes.SubCommand,
+						handle: handleReloadBot,
 					},
 				},
 			},
