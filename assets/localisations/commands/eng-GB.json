@@ -279,5 +279,15 @@
   "credits.strings.translation": "Translation",
   "acknowledgements.name": "acknowledgements",
   "acknowledgements.description": "Shows the acknowledgements menu.",
-  "acknowledgements.strings.acknowledgements": "Acknowledgements"
+  "acknowledgements.strings.acknowledgements": "Acknowledgements",
+  "maintenance.name": "maintenance",
+  "maintenance.description": "Allows the user to manage Logos.",
+  "maintenance.options.reload.name": "reload",
+  "maintenance.options.reload.description": "Allows the user to reload different parts of the bot.",
+  "maintenance.options.reload.options.guild.name": "server",
+  "maintenance.options.reload.options.guild.description": "Reloads the specified server, or the current server if one is not provided.",
+  "maintenance.options.reload.options.guild.strings.reloading.title": "Reloading...",
+  "maintenance.options.reload.options.guild.strings.reloading.description": "The specified server is being reloaded.",
+  "maintenance.options.reload.options.guild.strings.reloaded.title": "Reloaded!",
+  "maintenance.options.reload.options.guild.strings.reloaded.description": "The specified server has been reloaded."
 }

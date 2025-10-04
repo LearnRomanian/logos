@@ -21,7 +21,7 @@ class Client {
 	readonly environment: Environment;
 	readonly diagnostics: Diagnostics;
 
-	readonly #localisations: LocalisationStore;
+	readonly localisations: LocalisationStore;
 	readonly #commands: CommandStore;
 	readonly interactions: InteractionStore;
 	readonly #cache: CacheStore;
@@ -29,7 +29,7 @@ class Client {
 	readonly volatile?: VolatileStore;
 	readonly services: ServiceStore;
 	readonly #events: EventStore;
-	readonly #guilds: GuildStore;
+	readonly guilds: GuildStore;
 	readonly adapters: AdapterStore;
 	readonly #plugins: PluginStore;
 	readonly #connection: DiscordConnection;
@@ -40,19 +40,19 @@ class Client {
 	#stopSignal: string | undefined;
 
 	get localiseRaw(): LocalisationStore["localiseRaw"] {
-		return this.#localisations.localiseRaw.bind(this.#localisations);
+		return this.localisations.localiseRaw.bind(this.localisations);
 	}
 
 	get localise(): LocalisationStore["localise"] {
-		return this.#localisations.localise.bind(this.#localisations);
+		return this.localisations.localise.bind(this.localisations);
 	}
 
 	get localiseCommand(): LocalisationStore["localiseCommand"] {
-		return this.#localisations.localiseCommand.bind(this.#localisations);
+		return this.localisations.localiseCommand.bind(this.localisations);
 	}
 
 	get pluralise(): LocalisationStore["pluralise"] {
-		return this.#localisations.pluralise.bind(this.#localisations);
+		return this.localisations.pluralise.bind(this.localisations);
 	}
 
 	get commands(): CommandStore["commands"] {
@@ -182,9 +182,9 @@ class Client {
 		this.environment = environment;
 		this.diagnostics = new Diagnostics(this);
 
-		this.#localisations = new LocalisationStore({ log, localisations });
+		this.localisations = new LocalisationStore({ log, localisations });
 		this.#commands = CommandStore.create(this, {
-			localisations: this.#localisations,
+			localisations: this.localisations,
 			templates: commands,
 		});
 		this.interactions = new InteractionStore(this, { commands: this.#commands });
@@ -193,7 +193,7 @@ class Client {
 		this.volatile = VolatileStore.tryCreate(this);
 		this.services = new ServiceStore(this);
 		this.#events = new EventStore(this);
-		this.#guilds = new GuildStore(this, { services: this.services, commands: this.#commands });
+		this.guilds = new GuildStore(this, { services: this.services, commands: this.#commands });
 		this.adapters = new AdapterStore(this);
 		this.#plugins = new PluginStore(this);
 		this.#connection = new DiscordConnection({
@@ -236,7 +236,7 @@ class Client {
 		await this.volatile?.setup();
 		await this.database.setup();
 		await this.services.setup();
-		await this.#guilds.setup();
+		await this.guilds.setup();
 		await this.interactions.setup();
 		await this.#setupCollectors();
 		await this.#connection.open();
@@ -263,7 +263,7 @@ class Client {
 		this.volatile?.teardown();
 		await this.database.teardown();
 		await this.services.teardown();
-		await this.#guilds.teardown();
+		await this.guilds.teardown();
 		await this.interactions.teardown();
 		this.#teardownCollectors();
 		await this.#plugins.teardown();

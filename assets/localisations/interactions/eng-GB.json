@@ -12,5 +12,7 @@
   "interactions.show.sureToShow.yes": "Yes, show",
   "interactions.show.sureToShow.no": "No, do not show",
   "interactions.thinking": "Logos is thinking...",
-  "interactions.source": "Source"
+  "interactions.source": "Source",
+  "interactions.unauthorised.title": "Unauthorised",
+  "interactions.unauthorised.description": "You are not authorised to run this command."
 }

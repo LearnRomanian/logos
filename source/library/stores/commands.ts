@@ -77,6 +77,7 @@ class CommandStore {
 			this.commands.settings,
 			this.commands.recognise,
 			this.commands.recogniseMessage,
+			this.commands.maintenance,
 		].filter(isDefined);
 	}
 
