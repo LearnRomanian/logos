@@ -31,7 +31,7 @@ import {
 	handleTranslateMessage,
 } from "logos/commands/handlers/translate";
 import { handleFindWord, handleFindWordAutocomplete } from "logos/commands/handlers/word";
-import { handleReloadGuild } from "logos/commands/handlers/maintenance/reload/guild";
+import { handleReloadGuild, handleReloadGuildAutocomplete } from "logos/commands/handlers/maintenance/reload/guild";
 
 /**
  * @remarks
@@ -310,6 +310,14 @@ const commands = Object.freeze({
 						identifier: "guild",
 						type: Discord.ApplicationCommandOptionTypes.SubCommand,
 						handle: handleReloadGuild,
+						handleAutocomplete: handleReloadGuildAutocomplete,
+						options: {
+							guild: {
+								identifier: "guild",
+								type: Discord.ApplicationCommandOptionTypes.String,
+								autocomplete: true,
+							},
+						},
 					},
 				},
 			},

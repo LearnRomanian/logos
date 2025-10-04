@@ -286,6 +286,8 @@
   "maintenance.options.reload.description": "Allows the user to reload different parts of the bot.",
   "maintenance.options.reload.options.guild.name": "server",
   "maintenance.options.reload.options.guild.description": "Reloads the specified server, or the current server if one is not provided.",
+  "maintenance.options.reload.options.guild.options.guild.name": "server",
+  "maintenance.options.reload.options.guild.options.guild.description": "The server to reload.",
   "maintenance.options.reload.options.guild.strings.reloading.title": "Reloading...",
   "maintenance.options.reload.options.guild.strings.reloading.description": "The specified server is being reloaded.",
   "maintenance.options.reload.options.guild.strings.reloaded.title": "Reloaded!",

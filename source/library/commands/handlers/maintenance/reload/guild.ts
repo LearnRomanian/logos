@@ -1,4 +1,25 @@
 import type { Client } from "logos/client";
+import { handleSimpleAutocomplete } from "logos/commands/fragments/autocomplete/simple";
+import { isDefined } from "logos:core/utilities";
+
+async function handleReloadGuildAutocomplete(
+	client: Client,
+	interaction: Logos.Interaction<any, { guild: string | undefined }>,
+): Promise<void> {
+	if (!constants.MAINTAINER_IDS.includes(interaction.user.id)) {
+		return;
+	}
+
+	const guilds = Array.from(client.documents.guilds.values())
+		.map((guild) => client.entities.guilds.get(BigInt(guild.guildId)))
+		.filter(isDefined);
+
+	await handleSimpleAutocomplete(client, interaction, {
+		query: interaction.parameters.guild ?? "",
+		elements: guilds,
+		getOption: (guild) => ({ name: `${guild.name} (ID ${guild.id})`, value: guild.id.toString() }),
+	});
+}
 
 async function handleReloadGuild(
 	client: Client,
@@ -69,4 +90,4 @@ async function handleReloadGuild(
 	});
 }
 
-export { handleReloadGuild };
+export { handleReloadGuildAutocomplete, handleReloadGuild };
