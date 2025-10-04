@@ -33,6 +33,9 @@ const constants = Object.freeze({
 		size: 1024,
 	}),
 	STATUS_MESSAGE: "Helping you learn languages! 🌍",
+	MAINTAINER_IDS: [
+		217319536485990400n, // vxern
+	] as bigint[],
 	COMMAND_RATE_LIMIT_COUNT: 5,
 	COMMAND_RATE_LIMIT_WITHIN: 10 * 1000, // 10 seconds
 	MAXIMUM_DELETABLE_MESSAGES: 500,

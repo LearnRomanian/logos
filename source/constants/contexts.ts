@@ -559,5 +559,19 @@ export default Object.freeze({
 	phraseInContext: ({ localise, locale }) => ({
 		title: localise("context.strings.phraseInContext.title", locale),
 	}),
+	reloadGuild: ({ localise, locale }) => ({
+		reloading: {
+			title: localise("maintenance.options.reload.options.guild.strings.reloading.title", locale),
+			description: localise("maintenance.options.reload.options.guild.strings.reloading.description", locale),
+		},
+		reloaded: {
+			title: localise("maintenance.options.reload.options.guild.strings.reloaded.title", locale),
+			description: localise("maintenance.options.reload.options.guild.strings.reloaded.description", locale),
+		},
+	}),
+	unauthorised: ({ localise, locale }) => ({
+		title: localise("interactions.unauthorised.title", locale),
+		description: localise("interactions.unauthorised.description", locale),
+	}),
 } satisfies Record<string, ContextBuilder<any>>);
 export type { ContextBuilder };

@@ -589,13 +589,26 @@ function setCallbackColour(embedOrData: EmbedOrCallbackData, { colour }: { colou
 		}
 
 		embedOrData.color = colour;
-	} else if (embedOrData.embeds !== undefined) {
+
+		return embedOrData;
+	}
+
+	if (embedOrData.embeds !== undefined) {
 		for (const embed of embedOrData.embeds) {
 			if (embed.color !== undefined) {
 				continue;
 			}
 
 			embed.color = colour;
+		}
+
+		return embedOrData;
+	}
+
+	if (embedOrData.flags !== undefined && Discord.MessageFlags.IsComponentV2 & embedOrData.flags) {
+		const component = embedOrData.components?.at(0);
+		if (component !== undefined && component.type === Discord.MessageComponentTypes.Container) {
+			component.accentColor = colour;
 		}
 	}
 

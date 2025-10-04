@@ -1,3 +1,4 @@
+import contexts from "logos:constants/contexts";
 import {
 	type Locale,
 	type LocalisationLanguage,
@@ -20,6 +21,7 @@ type Localisations = Map<
 		LocalisationBuilder
 	>
 >;
+
 interface NameLocalisations {
 	readonly name: string;
 	readonly nameLocalizations?: Partial<Record<Discord.Locales, string>>;
@@ -28,6 +30,9 @@ interface DescriptionLocalisations {
 	readonly description: string;
 	readonly descriptionLocalizations?: Partial<Record<Discord.Locales, string>>;
 }
+
+type Contexts = typeof contexts;
+
 class LocalisationStore {
 	readonly log: pino.Logger;
 
@@ -235,6 +240,22 @@ class LocalisationStore {
 		}
 
 		return pluralised;
+	}
+
+	useContext<K extends keyof Contexts>(name: K, { locale }: { locale: Locale }): ReturnType<Contexts[K]> {
+		return contexts[name]({ localise: this.localise, locale }) as ReturnType<Contexts[K]>;
+	}
+
+	useContexts<K extends keyof Contexts>(
+		names: K[],
+		{ locale }: { locale: Locale },
+	): { [P in K]: ReturnType<Contexts[P]> } {
+		const result = {};
+		for (const name of names) {
+			Object.assign(result, { [name]: contexts[name]({ localise: this.localise.bind(this), locale }) });
+		}
+
+		return result as { [P in K]: ReturnType<Contexts[P]> };
 	}
 }
 

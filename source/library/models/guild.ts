@@ -42,15 +42,19 @@ class Guild extends GuildModel {
 		this.features = features ?? {};
 	}
 
-	static async get(client: Client, data: IdentifierData<Guild>): Promise<Guild | undefined> {
+	static async fetch(client: Client, data: IdentifierData<Guild>): Promise<Guild | undefined> {
+		return client.database.withSession((session) => {
+			return session.get<Guild>(Model.buildId<Guild>(data, { collection: "Guilds" }));
+		});
+	}
+
+	static async getOrFetch(client: Client, data: IdentifierData<Guild>): Promise<Guild | undefined> {
 		const partialId = Model.buildPartialId(data);
 		if (client.documents.guilds.has(partialId)) {
 			return client.documents.guilds.get(partialId)!;
 		}
 
-		return client.database.withSession((session) => {
-			return session.get<Guild>(Model.buildId<Guild>(data, { collection: "Guilds" }));
-		});
+		return Guild.fetch(client, data);
 	}
 
 	static async create(client: Client, data: CreateGuildOptions): Promise<Guild> {
@@ -64,7 +68,7 @@ class Guild extends GuildModel {
 	}
 
 	static async getOrCreate(client: Client, data: CreateGuildOptions): Promise<Guild> {
-		const guildDocument = await Guild.get(client, data);
+		const guildDocument = await Guild.getOrFetch(client, data);
 		if (guildDocument !== undefined) {
 			return guildDocument;
 		}

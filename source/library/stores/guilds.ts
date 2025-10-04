@@ -13,7 +13,7 @@ class GuildStore {
 	readonly #client: Client;
 	readonly #services: ServiceStore;
 	readonly #commands: CommandStore;
-	readonly #guildReloadLock: ActionLock;
+	readonly #guildReloadLocks: Map<bigint, ActionLock>;
 	readonly #guildCreateCollector: Collector<"guildCreate">;
 	readonly #guildDeleteCollector: Collector<"guildDelete">;
 
@@ -23,7 +23,7 @@ class GuildStore {
 		this.#client = client;
 		this.#services = services;
 		this.#commands = commands;
-		this.#guildReloadLock = new ActionLock();
+		this.#guildReloadLocks = new Map();
 		this.#guildCreateCollector = new Collector<"guildCreate">();
 		this.#guildDeleteCollector = new Collector<"guildDelete">();
 	}
@@ -43,7 +43,9 @@ class GuildStore {
 	async teardown(): Promise<void> {
 		this.log.info("Tearing down guild store...");
 
-		await this.#guildReloadLock.dispose();
+		for (const lock of this.#guildReloadLocks.values()) {
+			await lock.dispose();
+		}
 
 		this.#guildCreateCollector.close();
 		this.#guildDeleteCollector.close();
@@ -101,16 +103,30 @@ class GuildStore {
 	}
 
 	async #teardownGuild({ guildId }: { guildId: bigint }): Promise<void> {
+		const lock = this.#guildReloadLocks.get(guildId);
+		if (lock !== undefined) {
+			this.#guildReloadLocks.delete(guildId);
+			await lock.dispose();
+		}
+
 		await this.#services.stopForGuild({ guildId });
 
 		// We don't unregister guild commands: They'll be updated the next time the guild is set up anyway.
 	}
 
-	async reloadGuild(guildId: bigint): Promise<void> {
-		await this.#guildReloadLock.doAction(() => this.#handleGuildReload(guildId));
+	async reloadGuild({ guildId }: { guildId: bigint }): Promise<void> {
+		let lock: ActionLock;
+		if (this.#guildReloadLocks.has(guildId)) {
+			lock = this.#guildReloadLocks.get(guildId)!;
+		} else {
+			lock = new ActionLock();
+			this.#guildReloadLocks.set(guildId, lock);
+		}
+
+		await lock.doAction(() => this.#handleGuildReload({ guildId }));
 	}
 
-	async #handleGuildReload(guildId: bigint): Promise<void> {
+	async #handleGuildReload({ guildId }: { guildId: bigint }): Promise<void> {
 		const guild = this.#client.entities.guilds.get(guildId);
 		if (guild === undefined) {
 			this.log.warn(`Tried to reload ${this.#client.diagnostics.guild(guildId)}, but it wasn't cached.`);
@@ -119,10 +135,12 @@ class GuildStore {
 
 		this.log.info(`Reloading ${this.#client.diagnostics.guild(guildId)}...`);
 
+		await Guild.fetch(this.#client, { guildId: guildId.toString() });
+
 		await this.#teardownGuild({ guildId });
 		await this.#setupGuild(guild, { isReload: true });
 
-		this.log.info(`${this.#client.diagnostics.guild(guildId)} has been reloaded.`);
+		this.log.info(`The ${this.#client.diagnostics.guild(guildId)} has been reloaded.`);
 	}
 }
 
