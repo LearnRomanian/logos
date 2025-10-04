@@ -61,7 +61,13 @@ class ActionLock {
 			return;
 		}
 
+		const remainingActionCount = this.#handlerQueue.length;
+
 		this.#handlerQueue.length = 0;
+
+		if (remainingActionCount === 0) {
+			return;
+		}
 
 		const { promise, resolve } = Promise.withResolvers<void>();
 
