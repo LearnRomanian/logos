@@ -291,5 +291,9 @@
   "maintenance.options.reload.options.guild.strings.reloading.title": "Reloading...",
   "maintenance.options.reload.options.guild.strings.reloading.description": "The specified server is being reloaded.",
   "maintenance.options.reload.options.guild.strings.reloaded.title": "Reloaded!",
-  "maintenance.options.reload.options.guild.strings.reloaded.description": "The specified server has been reloaded."
+  "maintenance.options.reload.options.guild.strings.reloaded.description": "The specified server has been reloaded.",
+  "maintenance.options.reload.options.bot.name": "bot",
+  "maintenance.options.reload.options.bot.description": "Reloads the bot and all of its guilds.",
+  "maintenance.options.reload.options.bot.strings.reloading.title": "Reloading...",
+  "maintenance.options.reload.options.bot.strings.reloading.description": "The bot is being reloaded."
 }

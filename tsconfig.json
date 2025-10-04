@@ -35,6 +35,7 @@
 			"logos:constants/*": ["./source/constants/*"],
 			"logos:database/*": ["./database/*"],
 			"logos:core/*": ["./source/*"],
+			"logos:scripts/*": ["./scripts/*"],
 			"logos:test/*": ["./test/*"],
 			"logos:core/constants/*": ["./?"],
 			"logos:core/library/*": ["./?"],

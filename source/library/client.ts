@@ -229,7 +229,7 @@ class Client {
 	}
 
 	async start(): Promise<void> {
-		this.#stopOnSignal();
+		this.#setupSignals();
 
 		this.log.info("Starting client...");
 
@@ -245,7 +245,7 @@ class Client {
 		this.log.info("Client started.");
 	}
 
-	async stop({ signal }: { signal?: string }): Promise<void> {
+	async stop({ signal }: { signal?: string } = {}): Promise<void> {
 		if (this.#isStopping) {
 			if (this.#stopSignal === signal) {
 				this.log.info("The client is already being stopped...");
@@ -273,18 +273,29 @@ class Client {
 		this.#stopSignal = undefined;
 
 		this.log.info("Client stopped.");
+
+		this.#teardownSignals();
 	}
 
-	#stopOnSignal(): void {
-		process.on("SIGINT", async () => {
-			await this.stop({ signal: "SIGINT" });
-			process.exit();
-		});
-		process.on("SIGTERM", async () => {
-			await this.stop({ signal: "SIGTERM" });
-			process.exit();
-		});
+	#setupSignals(): void {
+		process.on("SIGINT", this.#handleInterruption);
+		process.on("SIGTERM", this.#handleTermination);
 	}
+
+	#teardownSignals(): void {
+		process.off("SIGINT", this.#handleInterruption);
+		process.off("SIGTERM", this.#handleTermination);
+	}
+
+	#handleInterruption = async (): Promise<void> => {
+		await this.stop({ signal: "SIGINT" });
+		process.exit();
+	};
+
+	#handleTermination = async (): Promise<void> => {
+		await this.stop({ signal: "SIGINT" });
+		process.exit();
+	};
 }
 
 export { Client };

@@ -20,7 +20,7 @@ interface LemmaUses {
 
 class VolatileStore {
 	readonly log: pino.Logger;
-	readonly redis: Redis;
+	redis: Redis;
 
 	constructor({
 		log,
@@ -84,6 +84,13 @@ class VolatileStore {
 		this.log.info("Disconnecting from Redis instance...");
 
 		this.redis.disconnect();
+		this.redis = new Redis({
+			host: this.redis.options.host,
+			port: this.redis.options.port,
+			password: this.redis.options.password,
+			reconnectOnError: (_) => true,
+			lazyConnect: true,
+		});
 
 		this.log.info("Disconnected from Redis instance...");
 	}
