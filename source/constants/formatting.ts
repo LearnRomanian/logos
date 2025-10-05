@@ -158,5 +158,20 @@ function escapeFormatting(string: string): string {
 	return string.replaceAll("*", "\\*").replaceAll("_", "\\_").replaceAll("~", "\\~");
 }
 
-export { capitalise, decapitalise, code, codeMultiline, list, mention, timestamp, trim, escapeFormatting };
+function removeDiacritics(string: string): string {
+	return string.normalize("NFD").replace(/\p{M}/gu, "");
+}
+
+export {
+	capitalise,
+	decapitalise,
+	code,
+	codeMultiline,
+	list,
+	mention,
+	timestamp,
+	trim,
+	escapeFormatting,
+	removeDiacritics,
+};
 export type { TimestampFormat, MentionType };

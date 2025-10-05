@@ -10,7 +10,7 @@ async function handleDisplayDictionaryLicenceAutocomplete(
 	await handleSimpleAutocomplete(client, interaction, {
 		query: interaction.parameters.dictionary,
 		elements: Object.entries(constants.licences.dictionaries),
-		getOption: ([identifier, dictionary]) => ({ name: dictionary.name, value: identifier }),
+		formatChoice: ([identifier, dictionary]) => ({ name: dictionary.name, value: identifier }),
 	});
 }
 

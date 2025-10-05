@@ -17,7 +17,7 @@ async function handleReloadGuildAutocomplete(
 	await handleSimpleAutocomplete(client, interaction, {
 		query: interaction.parameters.guild ?? "",
 		elements: guilds,
-		getOption: (guild) => ({ name: `${guild.name} (ID ${guild.id})`, value: guild.id.toString() }),
+		formatChoice: (guild) => ({ name: `${guild.name} (ID ${guild.id})`, value: guild.id.toString() }),
 	});
 }
 

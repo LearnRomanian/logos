@@ -10,7 +10,7 @@ async function handleDisplayDetectorLicenceAutocomplete(
 	await handleSimpleAutocomplete(client, interaction, {
 		query: interaction.parameters.detector,
 		elements: Object.entries(constants.licences.detectors),
-		getOption: ([identifier, detector]) => ({ name: detector.name, value: identifier }),
+		formatChoice: ([identifier, detector]) => ({ name: detector.name, value: identifier }),
 	});
 }
 

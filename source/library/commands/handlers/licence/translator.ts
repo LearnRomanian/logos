@@ -10,7 +10,7 @@ async function handleDisplayTranslatorLicenceAutocomplete(
 	await handleSimpleAutocomplete(client, interaction, {
 		query: interaction.parameters.translator,
 		elements: Object.entries(constants.licences.translators),
-		getOption: ([identifier, translator]) => ({ name: translator.name, value: identifier }),
+		formatChoice: ([identifier, translator]) => ({ name: translator.name, value: identifier }),
 	});
 }
 
