@@ -243,7 +243,7 @@ class LocalisationStore {
 	}
 
 	useContext<K extends keyof Contexts>(name: K, { locale }: { locale: Locale }): ReturnType<Contexts[K]> {
-		return contexts[name]({ localise: this.localise, locale }) as ReturnType<Contexts[K]>;
+		return contexts[name]({ localise: this.localise.bind(this), locale }) as ReturnType<Contexts[K]>;
 	}
 
 	useContexts<K extends keyof Contexts>(

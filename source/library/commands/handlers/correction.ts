@@ -1,6 +1,7 @@
 import { diffWordsWithSpace } from "diff";
 import type { Client } from "logos/client";
 import { CorrectionComposer } from "logos/commands/components/modal-composers/correction-composer";
+import { ConfirmationPrompt } from "logos/commands/components/confirmation-prompt/confirmation-prompt";
 import { Guild } from "logos/models/guild";
 
 type CorrectionMode = "partial" | "full";
@@ -32,12 +33,12 @@ async function handleMakeCorrection(
 		return;
 	}
 
-	if (message.author.id === interaction.user.id) {
-		const strings = constants.contexts.cannotCorrectOwn({ localise: client.localise, locale: interaction.locale });
-		client.warning(interaction, { title: strings.title, description: strings.description }).ignore();
+	// if (message.author.id === interaction.user.id) {
+	// 	const strings = constants.contexts.cannotCorrectOwn({ localise: client.localise, locale: interaction.locale });
+	// 	client.warning(interaction, { title: strings.title, description: strings.description }).ignore();
 
-		return;
-	}
+	// 	return;
+	// }
 
 	const correctedMember = client.entities.members.get(interaction.guildId)?.get(message.author.id);
 	if (correctedMember === undefined) {
@@ -96,8 +97,10 @@ async function handleMakeCorrection(
 			return `${content}${part.value}`;
 		}, "");
 
+		const deletionConfirmation = new ConfirmationPrompt(client, { interaction: submission });
+
 		const strings = constants.contexts.correction({ localise: client.localise, locale: interaction.displayLocale });
-		client.bot.helpers
+		const correctionMessage = await client.bot.helpers
 			.sendMessage(message.channelId, {
 				flags: Discord.MessageFlags.IsComponentV2,
 				messageReference: {
@@ -121,17 +124,44 @@ async function handleMakeCorrection(
 									username: interaction.member?.nick ?? interaction.user.username,
 								})}`,
 							},
+							{
+								type: Discord.MessageComponentTypes.Separator,
+								spacing: Discord.SeparatorSpacingSize.Large,
+							},
+							{
+								type: Discord.MessageComponentTypes.ActionRow,
+								components: [
+									{
+										type: Discord.MessageComponentTypes.Button,
+										customId: deletionConfirmation.collector.customId,
+										label: strings.delete,
+										style: Discord.ButtonStyles.Danger,
+										emoji: { name: constants.emojis.delete },
+									},
+								],
+							},
 						],
 					},
 				],
 			})
-			.catch((error) =>
+			.catch((error) => {
 				client.log.warn(
 					error,
 					`Failed to send correction to ${client.diagnostics.channel(message.channelId)}.`,
-				),
-			)
-			.ignore();
+				);
+				return undefined;
+			});
+		if (correctionMessage === undefined) {
+			return;
+		}
+
+		deletionConfirmation.onConfirm(() =>
+			client.bot.helpers.deleteMessage(correctionMessage.channelId, correctionMessage.id).catch((error) => {
+				client.log.warn(error, "Failed to delete correction message.");
+			}),
+		);
+
+		await deletionConfirmation.initialise();
 	});
 
 	await composer.open();
