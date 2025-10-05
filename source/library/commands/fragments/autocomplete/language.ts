@@ -19,7 +19,7 @@ async function handleAutocompleteLanguage(
 	await handleSimpleAutocomplete(client, interaction, {
 		query: parameter,
 		elements: constants.languages.languages[type],
-		getOption: (language) => {
+		formatChoice: (language) => {
 			const languageFlag = constants.emojis.flags[language];
 			const languageName = client.localise(constants.localisations.languages[language], interaction.locale)();
 
