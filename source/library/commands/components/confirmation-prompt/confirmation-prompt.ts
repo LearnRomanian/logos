@@ -6,26 +6,37 @@ type CancelEvent = () => Promise<void>;
 
 class ConfirmationPrompt {
 	readonly client: Client;
-	readonly #anchor: Logos.Interaction;
 	readonly collector: InteractionCollector;
+	readonly title: string;
+	readonly description: string;
+	readonly yes: string;
+	readonly no: string;
 
 	#onConfirm?: ConfirmEvent;
 	#onCancel?: CancelEvent;
 
-	constructor(client: Client, { interaction }: { interaction: Logos.Interaction }) {
+	constructor(
+		client: Client,
+		{
+			interaction,
+			title,
+			description,
+			yes,
+			no,
+		}: { interaction: Logos.Interaction; title: string; description: string; yes: string; no: string },
+	) {
 		this.client = client;
-		this.#anchor = interaction;
 		this.collector = new InteractionCollector(client, {
 			guildId: interaction.guildId,
 			only: [interaction.user.id],
 		});
+		this.title = title;
+		this.description = description;
+		this.yes = yes;
+		this.no = no;
 	}
 
 	async initialise(): Promise<void> {
-		const strings = this.client.localisations.useContext("sureToDeleteCorrection", {
-			locale: this.#anchor.displayLocale,
-		});
-
 		this.collector.onInteraction(async (buttonPress) => {
 			await this.client.postponeReply(buttonPress);
 
@@ -62,7 +73,7 @@ class ConfirmationPrompt {
 							components: [
 								{
 									type: Discord.MessageComponentTypes.TextDisplay,
-									content: `# ${strings.title}\n${strings.description}`,
+									content: `# ${this.title}\n${this.description}`,
 								},
 								{
 									type: Discord.MessageComponentTypes.Separator,
@@ -74,13 +85,13 @@ class ConfirmationPrompt {
 										{
 											type: Discord.MessageComponentTypes.Button,
 											customId: confirmButton.customId,
-											label: strings.yes,
+											label: this.yes,
 											style: Discord.ButtonStyles.Success,
 										},
 										{
 											type: Discord.MessageComponentTypes.Button,
 											customId: cancelButton.customId,
-											label: strings.no,
+											label: this.no,
 											style: Discord.ButtonStyles.Danger,
 										},
 									],

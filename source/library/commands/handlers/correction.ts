@@ -33,12 +33,12 @@ async function handleMakeCorrection(
 		return;
 	}
 
-	// if (message.author.id === interaction.user.id) {
-	// 	const strings = constants.contexts.cannotCorrectOwn({ localise: client.localise, locale: interaction.locale });
-	// 	client.warning(interaction, { title: strings.title, description: strings.description }).ignore();
+	if (message.author.id === interaction.user.id) {
+		const strings = constants.contexts.cannotCorrectOwn({ localise: client.localise, locale: interaction.locale });
+		client.warning(interaction, { title: strings.title, description: strings.description }).ignore();
 
-	// 	return;
-	// }
+		return;
+	}
 
 	const correctedMember = client.entities.members.get(interaction.guildId)?.get(message.author.id);
 	if (correctedMember === undefined) {
@@ -97,9 +97,22 @@ async function handleMakeCorrection(
 			return `${content}${part.value}`;
 		}, "");
 
-		const deletionConfirmation = new ConfirmationPrompt(client, { interaction: submission });
+		const strings = {
+			correction: constants.contexts.correction({ localise: client.localise, locale: interaction.displayLocale }),
+			sureToDeleteCorrection: constants.contexts.sureToDeleteCorrection({
+				localise: client.localise,
+				locale: interaction.displayLocale,
+			}),
+		};
 
-		const strings = constants.contexts.correction({ localise: client.localise, locale: interaction.displayLocale });
+		const deletionConfirmation = new ConfirmationPrompt(client, {
+			interaction: submission,
+			title: strings.sureToDeleteCorrection.title,
+			description: strings.sureToDeleteCorrection.description,
+			yes: strings.sureToDeleteCorrection.yes,
+			no: strings.sureToDeleteCorrection.no,
+		});
+
 		const correctionMessage = await client.bot.helpers
 			.sendMessage(message.channelId, {
 				flags: Discord.MessageFlags.IsComponentV2,
@@ -120,7 +133,7 @@ async function handleMakeCorrection(
 							},
 							{
 								type: Discord.MessageComponentTypes.TextDisplay,
-								content: `-# ${constants.emojis.commands.correction} ${strings.suggestedBy({
+								content: `-# ${constants.emojis.commands.correction} ${strings.correction.suggestedBy({
 									username: interaction.member?.nick ?? interaction.user.username,
 								})}`,
 							},
@@ -134,7 +147,7 @@ async function handleMakeCorrection(
 									{
 										type: Discord.MessageComponentTypes.Button,
 										customId: deletionConfirmation.collector.customId,
-										label: strings.delete,
+										label: strings.correction.delete,
 										style: Discord.ButtonStyles.Danger,
 										emoji: { name: constants.emojis.delete },
 									},

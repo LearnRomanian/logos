@@ -190,8 +190,8 @@ export default Object.freeze({
 		description: localise("answer.strings.cannotAnswerOwn.description", locale)(),
 	}),
 	answer: ({ localise, locale }) => ({
-		answer: localise("answer.strings.answer", locale)(),
 		submittedBy: localise("answer.strings.submittedBy", locale),
+		delete: localise("answer.strings.delete", locale)(),
 	}),
 	cannotCorrect: ({ localise, locale }) => ({
 		title: localise("correction.strings.cannotCorrect.title", locale)(),
