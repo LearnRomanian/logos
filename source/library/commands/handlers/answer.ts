@@ -33,7 +33,7 @@ async function handleAnswer(client: Client, interaction: Logos.Interaction): Pro
 		client.acknowledge(submission).ignore();
 
 		const strings = {
-			answer: constants.contexts.answer({ localise: client.localise, locale: submission.locale }),
+			answer: constants.contexts.answer({ localise: client.localise, locale: submission.guildLocale }),
 			sureToDeleteAnswer: constants.contexts.sureToDeleteAnswer({
 				localise: client.localise,
 				locale: submission.locale,

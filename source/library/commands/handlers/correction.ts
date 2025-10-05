@@ -98,10 +98,10 @@ async function handleMakeCorrection(
 		}, "");
 
 		const strings = {
-			correction: constants.contexts.correction({ localise: client.localise, locale: interaction.displayLocale }),
+			correction: constants.contexts.correction({ localise: client.localise, locale: interaction.guildLocale }),
 			sureToDeleteCorrection: constants.contexts.sureToDeleteCorrection({
 				localise: client.localise,
-				locale: interaction.displayLocale,
+				locale: interaction.locale,
 			}),
 		};
 
