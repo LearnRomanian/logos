@@ -190,8 +190,8 @@ export default Object.freeze({
 		description: localise("answer.strings.cannotAnswerOwn.description", locale)(),
 	}),
 	answer: ({ localise, locale }) => ({
-		answer: localise("answer.strings.answer", locale)(),
 		submittedBy: localise("answer.strings.submittedBy", locale),
+		delete: localise("answer.strings.delete", locale)(),
 	}),
 	cannotCorrect: ({ localise, locale }) => ({
 		title: localise("correction.strings.cannotCorrect.title", locale)(),
@@ -214,6 +214,7 @@ export default Object.freeze({
 	}),
 	correction: ({ localise, locale }) => ({
 		suggestedBy: localise("correction.strings.suggestedBy", locale),
+		delete: localise("correction.strings.delete", locale)(),
 	}),
 	cannotUseMessageForTranslation: ({ localise, locale }) => ({
 		title: localise("translate.strings.cannotUse.title", locale)(),
@@ -332,6 +333,18 @@ export default Object.freeze({
 		description: localise("interactions.show.sureToShow.description", locale)(),
 		yes: localise("interactions.show.sureToShow.yes", locale)(),
 		no: localise("interactions.show.sureToShow.no", locale)(),
+	}),
+	sureToDeleteCorrection: ({ localise, locale }) => ({
+		title: localise("correction.strings.delete.sureToDelete.title", locale)(),
+		description: localise("correction.strings.delete.sureToDelete.description", locale)(),
+		yes: localise("correction.strings.delete.sureToDelete.yes", locale)(),
+		no: localise("correction.strings.delete.sureToDelete.no", locale)(),
+	}),
+	sureToDeleteAnswer: ({ localise, locale }) => ({
+		title: localise("answer.strings.delete.sureToDelete.title", locale)(),
+		description: localise("answer.strings.delete.sureToDelete.description", locale)(),
+		yes: localise("answer.strings.delete.sureToDelete.yes", locale)(),
+		no: localise("answer.strings.delete.sureToDelete.no", locale)(),
 	}),
 	show: ({ localise, locale }) => ({
 		show: localise("interactions.show", locale)(),

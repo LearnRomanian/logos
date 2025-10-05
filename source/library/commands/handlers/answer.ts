@@ -1,5 +1,6 @@
 import type { Client } from "logos/client";
 import { AnswerComposer } from "logos/commands/components/modal-composers/answer-composer";
+import { ConfirmationPrompt } from "logos/commands/components/confirmation-prompt/confirmation-prompt";
 
 async function handleAnswer(client: Client, interaction: Logos.Interaction): Promise<void> {
 	const member = client.entities.members.get(interaction.guildId)?.get(interaction.user.id);
@@ -31,7 +32,21 @@ async function handleAnswer(client: Client, interaction: Logos.Interaction): Pro
 	composer.onSubmit(async (submission, { formData }) => {
 		client.acknowledge(submission).ignore();
 
-		const strings = constants.contexts.answer({ localise: client.localise, locale: submission.locale });
+		const strings = {
+			answer: constants.contexts.answer({ localise: client.localise, locale: submission.locale }),
+			sureToDeleteAnswer: constants.contexts.sureToDeleteAnswer({
+				localise: client.localise,
+				locale: submission.locale,
+			}),
+		};
+
+		const deletionConfirmation = new ConfirmationPrompt(client, {
+			interaction: submission,
+			title: strings.sureToDeleteAnswer.title,
+			description: strings.sureToDeleteAnswer.description,
+			yes: strings.sureToDeleteAnswer.yes,
+			no: strings.sureToDeleteAnswer.no,
+		});
 
 		client.bot.helpers
 			.sendMessage(message.channelId, {
@@ -53,9 +68,25 @@ async function handleAnswer(client: Client, interaction: Logos.Interaction): Pro
 							},
 							{
 								type: Discord.MessageComponentTypes.TextDisplay,
-								content: `-# ${constants.emojis.commands.answer} ${strings.submittedBy({
+								content: `-# ${constants.emojis.commands.answer} ${strings.answer.submittedBy({
 									username: interaction.member?.nick ?? interaction.user.username,
 								})}`,
+							},
+							{
+								type: Discord.MessageComponentTypes.Separator,
+								spacing: Discord.SeparatorSpacingSize.Large,
+							},
+							{
+								type: Discord.MessageComponentTypes.ActionRow,
+								components: [
+									{
+										type: Discord.MessageComponentTypes.Button,
+										customId: deletionConfirmation.collector.customId,
+										label: strings.answer.delete,
+										style: Discord.ButtonStyles.Danger,
+										emoji: { name: constants.emojis.delete },
+									},
+								],
 							},
 						],
 					},
