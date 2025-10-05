@@ -1,6 +1,6 @@
 import type { Client } from "logos/client";
-import { AnswerComposer } from "logos/commands/components/modal-composers/answer-composer";
 import { ConfirmationPrompt } from "logos/commands/components/confirmation-prompt/confirmation-prompt";
+import { AnswerComposer } from "logos/commands/components/modal-composers/answer-composer";
 
 async function handleAnswer(client: Client, interaction: Logos.Interaction): Promise<void> {
 	const member = client.entities.members.get(interaction.guildId)?.get(interaction.user.id);

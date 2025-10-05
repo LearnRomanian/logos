@@ -20,6 +20,8 @@ import {
 	handleDisplayTranslatorLicence,
 	handleDisplayTranslatorLicenceAutocomplete,
 } from "logos/commands/handlers/licence/translator";
+import { handleReloadBot } from "logos/commands/handlers/maintenance/reload/bot";
+import { handleReloadServer, handleReloadServerAutocomplete } from "logos/commands/handlers/maintenance/reload/server";
 import { handleRecogniseLanguageChatInput, handleRecogniseLanguageMessage } from "logos/commands/handlers/recognise";
 import { handleDisplayResources } from "logos/commands/handlers/resources";
 import { handleClearLanguage } from "logos/commands/handlers/settings/language/clear";
@@ -31,8 +33,6 @@ import {
 	handleTranslateMessage,
 } from "logos/commands/handlers/translate";
 import { handleFindWord, handleFindWordAutocomplete } from "logos/commands/handlers/word";
-import { handleReloadServer, handleReloadServerAutocomplete } from "logos/commands/handlers/maintenance/reload/server";
-import { handleReloadBot } from "logos/commands/handlers/maintenance/reload/bot";
 
 /**
  * @remarks

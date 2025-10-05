@@ -1,7 +1,7 @@
 import { diffWordsWithSpace } from "diff";
 import type { Client } from "logos/client";
-import { CorrectionComposer } from "logos/commands/components/modal-composers/correction-composer";
 import { ConfirmationPrompt } from "logos/commands/components/confirmation-prompt/confirmation-prompt";
+import { CorrectionComposer } from "logos/commands/components/modal-composers/correction-composer";
 import { Guild } from "logos/models/guild";
 
 type CorrectionMode = "partial" | "full";

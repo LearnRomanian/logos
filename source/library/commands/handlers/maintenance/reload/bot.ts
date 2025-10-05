@@ -1,5 +1,5 @@
-import type { Client } from "logos/client";
 import { run } from "logos:scripts/run";
+import type { Client } from "logos/client";
 
 async function handleReloadBot(
 	client: Client,
