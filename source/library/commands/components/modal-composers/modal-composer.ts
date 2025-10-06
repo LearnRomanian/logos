@@ -248,7 +248,7 @@ abstract class ModalComposer<FormData, ValidationError extends string> {
 
 			this.#formData = formData;
 
-			const error = await this.validate({ formData: this.#formData });
+			const error = this.validate({ formData: this.#formData });
 			if (error !== undefined) {
 				const newAnchor = await this.handleInvalid(submission, { error });
 				if (newAnchor === undefined) {
@@ -258,6 +258,8 @@ abstract class ModalComposer<FormData, ValidationError extends string> {
 				this.anchor = newAnchor;
 
 				await this.#display();
+
+				return;
 			}
 
 			await this.#dispatchSubmit(submission, { formData: this.#formData });
