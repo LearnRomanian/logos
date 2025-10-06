@@ -78,10 +78,7 @@ abstract class ModalComposer<FormData, ValidationError extends string> {
 		return undefined;
 	}
 
-	getErrorMessage(
-		_: Logos.Interaction,
-		__: { error: ValidationError },
-	): Discord.Camelize<Discord.DiscordEmbed> | undefined {
+	getErrorMessage(_: Logos.Interaction, __: { error: ValidationError }): Discord.TextDisplayComponent | undefined {
 		return undefined;
 	}
 
@@ -184,28 +181,38 @@ abstract class ModalComposer<FormData, ValidationError extends string> {
 		});
 
 		this.client
-			.editReply(submission, {
-				embeds: [
-					this.getErrorMessage(submission, { error }) ?? {
-						title: strings.title,
-						description: strings.description,
-					},
-				],
+			.reply(submission, {
 				components: [
 					{
-						type: Discord.MessageComponentTypes.ActionRow,
+						type: Discord.MessageComponentTypes.Container,
+						accentColor: constants.colours.warning,
 						components: [
-							{
-								type: Discord.MessageComponentTypes.Button,
-								customId: continueButton.customId,
-								label: strings.continue,
-								style: Discord.ButtonStyles.Success,
+							this.getErrorMessage(submission, { error }) ?? {
+								type: Discord.MessageComponentTypes.TextDisplay,
+								content: `# ${strings.title}\n${strings.description}`,
 							},
 							{
-								type: Discord.MessageComponentTypes.Button,
-								customId: cancelButton.customId,
-								label: strings.cancel,
-								style: Discord.ButtonStyles.Danger,
+								type: Discord.MessageComponentTypes.Separator,
+								spacing: Discord.SeparatorSpacingSize.Large,
+							},
+							{
+								type: Discord.MessageComponentTypes.ActionRow,
+								components: [
+									{
+										type: Discord.MessageComponentTypes.Button,
+										customId: continueButton.customId,
+										label: strings.continue,
+										style: Discord.ButtonStyles.Success,
+										emoji: { name: constants.emojis.continue },
+									},
+									{
+										type: Discord.MessageComponentTypes.Button,
+										customId: cancelButton.customId,
+										label: strings.cancel,
+										style: Discord.ButtonStyles.Danger,
+										emoji: { name: constants.emojis.cancel },
+									},
+								],
 							},
 						],
 					},
