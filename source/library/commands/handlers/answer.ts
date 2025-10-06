@@ -126,7 +126,7 @@ function getComponents(
 ): Discord.MessageComponents {
 	const strings = constants.contexts.answer({
 		localise: client.localise,
-		locale: interaction.locale,
+		locale: interaction.guildLocale,
 	});
 	return [
 		{

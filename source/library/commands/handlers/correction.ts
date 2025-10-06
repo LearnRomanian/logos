@@ -88,7 +88,7 @@ async function handleMakeCorrection(
 
 		const strings = constants.contexts.sureToDeleteCorrection({
 			localise: client.localise,
-			locale: interaction.displayLocale,
+			locale: interaction.locale,
 		});
 
 		const editButton = new InteractionCollector(client, {
@@ -200,7 +200,7 @@ function getComponents(
 
 	const strings = constants.contexts.correction({
 		localise: client.localise,
-		locale: interaction.locale,
+		locale: interaction.guildLocale,
 	});
 	return [
 		{
