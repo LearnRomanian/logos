@@ -78,10 +78,7 @@ abstract class ModalComposer<FormData, ValidationError extends string> {
 		return undefined;
 	}
 
-	getErrorMessage(
-		_: Logos.Interaction,
-		__: { error: ValidationError },
-	): Discord.Camelize<Discord.DiscordEmbed> | undefined {
+	getErrorMessage(_: Logos.Interaction, __: { error: ValidationError }): Discord.TextDisplayComponent | undefined {
 		return undefined;
 	}
 
@@ -140,28 +137,36 @@ abstract class ModalComposer<FormData, ValidationError extends string> {
 				locale: submission.locale,
 			});
 			this.client
-				.warning(cancelButtonPress, {
-					embeds: [
-						{
-							title: strings.title,
-							description: strings.description,
-						},
-					],
+				.pushback(cancelButtonPress, {
+					flags: Discord.MessageFlags.IsComponentV2,
 					components: [
 						{
-							type: Discord.MessageComponentTypes.ActionRow,
+							type: Discord.MessageComponentTypes.Container,
 							components: [
 								{
-									type: Discord.MessageComponentTypes.Button,
-									customId: returnButton.customId,
-									label: strings.stay,
-									style: Discord.ButtonStyles.Success,
+									type: Discord.MessageComponentTypes.TextDisplay,
+									content: `# ${strings.title}\n${strings.description}`,
 								},
 								{
-									type: Discord.MessageComponentTypes.Button,
-									customId: leaveButton.customId,
-									label: strings.leave,
-									style: Discord.ButtonStyles.Danger,
+									type: Discord.MessageComponentTypes.Separator,
+									spacing: Discord.SeparatorSpacingSize.Large,
+								},
+								{
+									type: Discord.MessageComponentTypes.ActionRow,
+									components: [
+										{
+											type: Discord.MessageComponentTypes.Button,
+											customId: returnButton.customId,
+											label: strings.stay,
+											style: Discord.ButtonStyles.Success,
+										},
+										{
+											type: Discord.MessageComponentTypes.Button,
+											customId: leaveButton.customId,
+											label: strings.leave,
+											style: Discord.ButtonStyles.Danger,
+										},
+									],
 								},
 							],
 						},
@@ -184,28 +189,36 @@ abstract class ModalComposer<FormData, ValidationError extends string> {
 		});
 
 		this.client
-			.editReply(submission, {
-				embeds: [
-					this.getErrorMessage(submission, { error }) ?? {
-						title: strings.title,
-						description: strings.description,
-					},
-				],
+			.pushback(submission, {
+				flags: Discord.MessageFlags.IsComponentV2,
 				components: [
 					{
-						type: Discord.MessageComponentTypes.ActionRow,
+						type: Discord.MessageComponentTypes.Container,
 						components: [
-							{
-								type: Discord.MessageComponentTypes.Button,
-								customId: continueButton.customId,
-								label: strings.continue,
-								style: Discord.ButtonStyles.Success,
+							this.getErrorMessage(submission, { error }) ?? {
+								type: Discord.MessageComponentTypes.TextDisplay,
+								content: `# ${strings.title}\n${strings.description}`,
 							},
 							{
-								type: Discord.MessageComponentTypes.Button,
-								customId: cancelButton.customId,
-								label: strings.cancel,
-								style: Discord.ButtonStyles.Danger,
+								type: Discord.MessageComponentTypes.Separator,
+								spacing: Discord.SeparatorSpacingSize.Large,
+							},
+							{
+								type: Discord.MessageComponentTypes.ActionRow,
+								components: [
+									{
+										type: Discord.MessageComponentTypes.Button,
+										customId: continueButton.customId,
+										label: strings.continue,
+										style: Discord.ButtonStyles.Success,
+									},
+									{
+										type: Discord.MessageComponentTypes.Button,
+										customId: cancelButton.customId,
+										label: strings.cancel,
+										style: Discord.ButtonStyles.Danger,
+									},
+								],
 							},
 						],
 					},
@@ -235,7 +248,7 @@ abstract class ModalComposer<FormData, ValidationError extends string> {
 
 			this.#formData = formData;
 
-			const error = await this.validate({ formData: this.#formData });
+			const error = this.validate({ formData: this.#formData });
 			if (error !== undefined) {
 				const newAnchor = await this.handleInvalid(submission, { error });
 				if (newAnchor === undefined) {
@@ -245,6 +258,8 @@ abstract class ModalComposer<FormData, ValidationError extends string> {
 				this.anchor = newAnchor;
 
 				await this.#display();
+
+				return;
 			}
 
 			await this.#dispatchSubmit(submission, { formData: this.#formData });

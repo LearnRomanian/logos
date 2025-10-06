@@ -10,15 +10,11 @@ type ValidationError = "texts-not-different";
 class CorrectionComposer extends ModalComposer<CorrectionFormData, ValidationError> {
 	constructor(
 		client: Client,
-		{
-			interaction,
-			text,
-			prefillCorrectedField,
-		}: { interaction: Logos.Interaction; text: string; prefillCorrectedField: boolean },
+		{ interaction, original, corrected }: { interaction: Logos.Interaction; original: string; corrected: string },
 	) {
 		super(client, {
 			interaction,
-			initialFormData: { original: text, corrected: prefillCorrectedField ? text : "" },
+			initialFormData: { original, corrected },
 		});
 	}
 
@@ -72,21 +68,18 @@ class CorrectionComposer extends ModalComposer<CorrectionFormData, ValidationErr
 		return undefined;
 	}
 
-	getErrorMessage(
-		submission: Logos.Interaction,
-		_: { error: ValidationError },
-	): Discord.Camelize<Discord.DiscordEmbed> | undefined {
+	getErrorMessage(submission: Logos.Interaction, _: { error: ValidationError }): Discord.TextDisplayComponent {
 		const strings = constants.contexts.correctionTextsNotDifferent({
 			localise: this.client.localise,
 			locale: submission.locale,
 		});
 
 		return {
-			title: strings.title,
-			description: strings.description,
-			color: constants.colours.warning,
+			type: Discord.MessageComponentTypes.TextDisplay,
+			content: `# ${strings.title}\n${strings.description}`,
 		};
 	}
 }
 
 export { CorrectionComposer };
+export type { CorrectionFormData };

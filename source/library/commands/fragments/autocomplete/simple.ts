@@ -1,5 +1,5 @@
-import type { Client } from "logos/client";
 import { removeDiacritics } from "logos:constants/formatting";
+import type { Client } from "logos/client";
 
 async function handleSimpleAutocomplete<T>(
 	client: Client,

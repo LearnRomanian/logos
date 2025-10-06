@@ -1,6 +1,6 @@
+import { isDefined } from "logos:core/utilities";
 import type { Client } from "logos/client";
 import { handleSimpleAutocomplete } from "logos/commands/fragments/autocomplete/simple";
-import { isDefined } from "logos:core/utilities";
 
 async function handleReloadGuildAutocomplete(
 	client: Client,

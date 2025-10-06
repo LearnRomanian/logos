@@ -21,5 +21,6 @@ export default Object.freeze({
 		},
 	},
 	showInChat: "🗨️",
+	edit: "📝",
 	delete: "🗑️",
 } as const);
