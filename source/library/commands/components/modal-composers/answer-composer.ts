@@ -7,8 +7,11 @@ interface AnswerFormData {
 	readonly answer: string;
 }
 class AnswerComposer extends ModalComposer<AnswerFormData, never> {
-	constructor(client: Client, { interaction, question }: { interaction: Logos.Interaction; question: string }) {
-		super(client, { interaction, initialFormData: { question: trim(question, 4000), answer: "" } });
+	constructor(
+		client: Client,
+		{ interaction, question, answer = "" }: { interaction: Logos.Interaction; question: string; answer?: string },
+	) {
+		super(client, { interaction, initialFormData: { question: trim(question, 4000), answer: trim(answer, 4000) } });
 	}
 
 	buildModal(submission: Logos.Interaction, { formData }: { formData: AnswerFormData }): Modal<AnswerFormData> {
@@ -52,3 +55,4 @@ class AnswerComposer extends ModalComposer<AnswerFormData, never> {
 }
 
 export { AnswerComposer };
+export type { AnswerFormData };

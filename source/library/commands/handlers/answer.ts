@@ -1,6 +1,7 @@
 import type { Client } from "logos/client";
+import { InteractionCollector } from "logos/collectors";
 import { ConfirmationPrompt } from "logos/commands/components/confirmation-prompt/confirmation-prompt";
-import { AnswerComposer } from "logos/commands/components/modal-composers/answer-composer";
+import { AnswerComposer, type AnswerFormData } from "logos/commands/components/modal-composers/answer-composer";
 
 async function handleAnswer(client: Client, interaction: Logos.Interaction): Promise<void> {
 	const member = client.entities.members.get(interaction.guildId)?.get(interaction.user.id);
@@ -32,23 +33,21 @@ async function handleAnswer(client: Client, interaction: Logos.Interaction): Pro
 	composer.onSubmit(async (submission, { formData }) => {
 		client.acknowledge(submission).ignore();
 
-		const strings = {
-			answer: constants.contexts.answer({ localise: client.localise, locale: submission.locale }),
-			sureToDeleteAnswer: constants.contexts.sureToDeleteAnswer({
-				localise: client.localise,
-				locale: submission.locale,
-			}),
-		};
+		const strings = constants.contexts.sureToDeleteAnswer({ localise: client.localise, locale: submission.locale });
+
+		const editButton = new InteractionCollector(client, {
+			only: [submission.user.id],
+		});
 
 		const deletionConfirmation = new ConfirmationPrompt(client, {
 			interaction: submission,
-			title: strings.sureToDeleteAnswer.title,
-			description: strings.sureToDeleteAnswer.description,
-			yes: strings.sureToDeleteAnswer.yes,
-			no: strings.sureToDeleteAnswer.no,
+			title: strings.title,
+			description: strings.description,
+			yes: strings.yes,
+			no: strings.no,
 		});
 
-		client.bot.helpers
+		const answerMessage = await client.bot.helpers
 			.sendMessage(message.channelId, {
 				flags: Discord.MessageFlags.IsComponentV2,
 				messageReference: {
@@ -57,48 +56,119 @@ async function handleAnswer(client: Client, interaction: Logos.Interaction): Pro
 					guildId: interaction.guildId,
 					failIfNotExists: false,
 				},
-				components: [
-					{
-						type: Discord.MessageComponentTypes.Container,
-						accentColor: constants.colours.success,
-						components: [
-							{
-								type: Discord.MessageComponentTypes.TextDisplay,
-								content: `– *${formData.answer}*`,
-							},
-							{
-								type: Discord.MessageComponentTypes.TextDisplay,
-								content: `-# ${constants.emojis.commands.answer} ${strings.answer.submittedBy({
-									username: interaction.member?.nick ?? interaction.user.username,
-								})}`,
-							},
-							{
-								type: Discord.MessageComponentTypes.Separator,
-								spacing: Discord.SeparatorSpacingSize.Large,
-							},
-							{
-								type: Discord.MessageComponentTypes.ActionRow,
-								components: [
-									{
-										type: Discord.MessageComponentTypes.Button,
-										customId: deletionConfirmation.collector.customId,
-										label: strings.answer.delete,
-										style: Discord.ButtonStyles.Danger,
-										emoji: { name: constants.emojis.delete },
-									},
-								],
-							},
-						],
-					},
-				],
+				components: getComponents(client, {
+					interaction,
+					formData,
+					editButton,
+					deleteButton: deletionConfirmation.collector,
+				}),
 			})
-			.catch((error) =>
-				client.log.warn(error, `Failed to send answer to ${client.diagnostics.channel(message.channelId)}.`),
-			)
-			.ignore();
+			.catch((error) => {
+				client.log.warn(error, `Failed to send answer to ${client.diagnostics.channel(message.channelId)}.`);
+				return undefined;
+			});
+		if (answerMessage === undefined) {
+			return;
+		}
+
+		editButton.onInteraction(async (buttonPress) => {
+			const composer = new AnswerComposer(client, {
+				interaction: buttonPress,
+				question: message.content,
+				answer: formData.answer,
+			});
+
+			composer.onSubmit(async (submission, { formData: updatedFormData }) => {
+				formData = updatedFormData;
+
+				client.acknowledge(submission).ignore();
+
+				await client.bot.helpers.editMessage(answerMessage.channelId, answerMessage.id, {
+					components: getComponents(client, {
+						interaction,
+						formData,
+						editButton,
+						deleteButton: deletionConfirmation.collector,
+					}),
+				});
+			});
+
+			await composer.open();
+		});
+
+		await client.registerInteractionCollector(editButton);
+
+		deletionConfirmation.onConfirm(() =>
+			client.bot.helpers.deleteMessage(answerMessage.channelId, answerMessage.id).catch((error) => {
+				client.log.warn(error, "Failed to delete answer message.");
+			}),
+		);
+
+		await deletionConfirmation.initialise();
 	});
 
 	await composer.open();
+}
+
+function getComponents(
+	client: Client,
+	{
+		interaction,
+		formData,
+		editButton,
+		deleteButton,
+	}: {
+		interaction: Logos.Interaction;
+		formData: AnswerFormData;
+		editButton: InteractionCollector;
+		deleteButton: InteractionCollector;
+	},
+): Discord.MessageComponents {
+	const strings = constants.contexts.answer({
+		localise: client.localise,
+		locale: interaction.locale,
+	});
+	return [
+		{
+			type: Discord.MessageComponentTypes.Container,
+			accentColor: constants.colours.success,
+			components: [
+				{
+					type: Discord.MessageComponentTypes.TextDisplay,
+					content: `– *${formData.answer}*`,
+				},
+				{
+					type: Discord.MessageComponentTypes.TextDisplay,
+					content: `-# ${constants.emojis.commands.answer} ${strings.submittedBy({
+						username: interaction.member?.nick ?? interaction.user.username,
+					})}`,
+				},
+				{
+					type: Discord.MessageComponentTypes.Separator,
+					spacing: Discord.SeparatorSpacingSize.Large,
+				},
+				{
+					type: Discord.MessageComponentTypes.ActionRow,
+					components: [
+						{
+							type: Discord.MessageComponentTypes.Button,
+							customId: editButton.customId,
+							label: strings.edit,
+							style: Discord.ButtonStyles.Primary,
+							emoji: { name: constants.emojis.edit },
+						},
+						{
+							type: Discord.MessageComponentTypes.Button,
+							customId: deleteButton.customId,
+							label: strings.delete,
+							style: Discord.ButtonStyles.Danger,
+							emoji: { name: constants.emojis.delete },
+						},
+					],
+				},
+			],
+		},
+	];
 }
 
 export { handleAnswer };

@@ -191,6 +191,7 @@ export default Object.freeze({
 	}),
 	answer: ({ localise, locale }) => ({
 		submittedBy: localise("answer.strings.submittedBy", locale),
+		edit: localise("answer.strings.edit", locale)(),
 		delete: localise("answer.strings.delete", locale)(),
 	}),
 	cannotCorrect: ({ localise, locale }) => ({
@@ -214,6 +215,7 @@ export default Object.freeze({
 	}),
 	correction: ({ localise, locale }) => ({
 		suggestedBy: localise("correction.strings.suggestedBy", locale),
+		edit: localise("correction.strings.edit", locale)(),
 		delete: localise("correction.strings.delete", locale)(),
 	}),
 	cannotUseMessageForTranslation: ({ localise, locale }) => ({

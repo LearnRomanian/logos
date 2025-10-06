@@ -1,7 +1,11 @@
 import { diffWordsWithSpace } from "diff";
 import type { Client } from "logos/client";
+import { InteractionCollector } from "logos/collectors";
 import { ConfirmationPrompt } from "logos/commands/components/confirmation-prompt/confirmation-prompt";
-import { CorrectionComposer } from "logos/commands/components/modal-composers/correction-composer";
+import {
+	CorrectionComposer,
+	type CorrectionFormData,
+} from "logos/commands/components/modal-composers/correction-composer";
 import { Guild } from "logos/models/guild";
 
 type CorrectionMode = "partial" | "full";
@@ -75,42 +79,28 @@ async function handleMakeCorrection(
 
 	const composer = new CorrectionComposer(client, {
 		interaction,
-		text: message.content,
-		prefillCorrectedField: mode === "full",
+		original: message.content,
+		corrected: mode === "full" ? message.content : "",
 	});
 
 	composer.onSubmit(async (submission, { formData }) => {
 		client.acknowledge(submission).ignore();
 
-		const differences = diffWordsWithSpace(formData.original, formData.corrected, {
-			intlSegmenter: new Intl.Segmenter(interaction.learningLocale, { granularity: "word" }),
+		const strings = constants.contexts.sureToDeleteCorrection({
+			localise: client.localise,
+			locale: interaction.displayLocale,
 		});
-		const content = differences.reduce((content, part) => {
-			if (part.added) {
-				return `${content}__${part.value}__`;
-			}
 
-			if (part.removed) {
-				return content;
-			}
-
-			return `${content}${part.value}`;
-		}, "");
-
-		const strings = {
-			correction: constants.contexts.correction({ localise: client.localise, locale: interaction.displayLocale }),
-			sureToDeleteCorrection: constants.contexts.sureToDeleteCorrection({
-				localise: client.localise,
-				locale: interaction.displayLocale,
-			}),
-		};
+		const editButton = new InteractionCollector(client, {
+			only: [submission.user.id],
+		});
 
 		const deletionConfirmation = new ConfirmationPrompt(client, {
 			interaction: submission,
-			title: strings.sureToDeleteCorrection.title,
-			description: strings.sureToDeleteCorrection.description,
-			yes: strings.sureToDeleteCorrection.yes,
-			no: strings.sureToDeleteCorrection.no,
+			title: strings.title,
+			description: strings.description,
+			yes: strings.yes,
+			no: strings.no,
 		});
 
 		const correctionMessage = await client.bot.helpers
@@ -122,40 +112,12 @@ async function handleMakeCorrection(
 					guildId: interaction.guildId,
 					failIfNotExists: false,
 				},
-				components: [
-					{
-						type: Discord.MessageComponentTypes.Container,
-						accentColor: constants.colours.success,
-						components: [
-							{
-								type: Discord.MessageComponentTypes.TextDisplay,
-								content,
-							},
-							{
-								type: Discord.MessageComponentTypes.TextDisplay,
-								content: `-# ${constants.emojis.commands.correction} ${strings.correction.suggestedBy({
-									username: interaction.member?.nick ?? interaction.user.username,
-								})}`,
-							},
-							{
-								type: Discord.MessageComponentTypes.Separator,
-								spacing: Discord.SeparatorSpacingSize.Large,
-							},
-							{
-								type: Discord.MessageComponentTypes.ActionRow,
-								components: [
-									{
-										type: Discord.MessageComponentTypes.Button,
-										customId: deletionConfirmation.collector.customId,
-										label: strings.correction.delete,
-										style: Discord.ButtonStyles.Danger,
-										emoji: { name: constants.emojis.delete },
-									},
-								],
-							},
-						],
-					},
-				],
+				components: getComponents(client, {
+					interaction,
+					formData,
+					editButton,
+					deleteButton: deletionConfirmation.collector,
+				}),
 			})
 			.catch((error) => {
 				client.log.warn(
@@ -168,6 +130,33 @@ async function handleMakeCorrection(
 			return;
 		}
 
+		editButton.onInteraction(async (buttonPress) => {
+			const composer = new CorrectionComposer(client, {
+				interaction: buttonPress,
+				original: message.content,
+				corrected: formData.corrected,
+			});
+
+			composer.onSubmit(async (submission, { formData: updatedFormData }) => {
+				formData = updatedFormData;
+
+				client.acknowledge(submission).ignore();
+
+				await client.bot.helpers.editMessage(correctionMessage.channelId, correctionMessage.id, {
+					components: getComponents(client, {
+						interaction,
+						formData,
+						editButton,
+						deleteButton: deletionConfirmation.collector,
+					}),
+				});
+			});
+
+			await composer.open();
+		});
+
+		await client.registerInteractionCollector(editButton);
+
 		deletionConfirmation.onConfirm(() =>
 			client.bot.helpers.deleteMessage(correctionMessage.channelId, correctionMessage.id).catch((error) => {
 				client.log.warn(error, "Failed to delete correction message.");
@@ -178,6 +167,82 @@ async function handleMakeCorrection(
 	});
 
 	await composer.open();
+}
+
+function getComponents(
+	client: Client,
+	{
+		interaction,
+		formData,
+		editButton,
+		deleteButton,
+	}: {
+		interaction: Logos.Interaction;
+		formData: CorrectionFormData;
+		editButton: InteractionCollector;
+		deleteButton: InteractionCollector;
+	},
+): Discord.MessageComponents {
+	const differences = diffWordsWithSpace(formData.original, formData.corrected, {
+		intlSegmenter: new Intl.Segmenter(interaction.learningLocale, { granularity: "word" }),
+	});
+	const content = differences.reduce((content, part) => {
+		if (part.added) {
+			return `${content}__${part.value}__`;
+		}
+
+		if (part.removed) {
+			return content;
+		}
+
+		return `${content}${part.value}`;
+	}, "");
+
+	const strings = constants.contexts.correction({
+		localise: client.localise,
+		locale: interaction.locale,
+	});
+	return [
+		{
+			type: Discord.MessageComponentTypes.Container,
+			accentColor: constants.colours.success,
+			components: [
+				{
+					type: Discord.MessageComponentTypes.TextDisplay,
+					content,
+				},
+				{
+					type: Discord.MessageComponentTypes.TextDisplay,
+					content: `-# ${constants.emojis.commands.correction} ${strings.suggestedBy({
+						username: interaction.member?.nick ?? interaction.user.username,
+					})}`,
+				},
+				{
+					type: Discord.MessageComponentTypes.Separator,
+					spacing: Discord.SeparatorSpacingSize.Large,
+				},
+				{
+					type: Discord.MessageComponentTypes.ActionRow,
+					components: [
+						{
+							type: Discord.MessageComponentTypes.Button,
+							customId: editButton.customId,
+							label: strings.edit,
+							style: Discord.ButtonStyles.Primary,
+							emoji: { name: constants.emojis.edit },
+						},
+						{
+							type: Discord.MessageComponentTypes.Button,
+							customId: deleteButton.customId,
+							label: strings.delete,
+							style: Discord.ButtonStyles.Danger,
+							emoji: { name: constants.emojis.delete },
+						},
+					],
+				},
+			],
+		},
+	];
 }
 
 export { handleMakeFullCorrection, handleMakePartialCorrection };
