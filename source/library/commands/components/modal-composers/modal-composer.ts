@@ -138,27 +138,35 @@ abstract class ModalComposer<FormData, ValidationError extends string> {
 			});
 			this.client
 				.warning(cancelButtonPress, {
-					embeds: [
-						{
-							title: strings.title,
-							description: strings.description,
-						},
-					],
+					flags: Discord.MessageFlags.IsComponentV2,
 					components: [
 						{
-							type: Discord.MessageComponentTypes.ActionRow,
+							type: Discord.MessageComponentTypes.Container,
 							components: [
 								{
-									type: Discord.MessageComponentTypes.Button,
-									customId: returnButton.customId,
-									label: strings.stay,
-									style: Discord.ButtonStyles.Success,
+									type: Discord.MessageComponentTypes.TextDisplay,
+									content: `# ${strings.title}\n${strings.description}`,
 								},
 								{
-									type: Discord.MessageComponentTypes.Button,
-									customId: leaveButton.customId,
-									label: strings.leave,
-									style: Discord.ButtonStyles.Danger,
+									type: Discord.MessageComponentTypes.Separator,
+									spacing: Discord.SeparatorSpacingSize.Large,
+								},
+								{
+									type: Discord.MessageComponentTypes.ActionRow,
+									components: [
+										{
+											type: Discord.MessageComponentTypes.Button,
+											customId: returnButton.customId,
+											label: strings.stay,
+											style: Discord.ButtonStyles.Success,
+										},
+										{
+											type: Discord.MessageComponentTypes.Button,
+											customId: leaveButton.customId,
+											label: strings.leave,
+											style: Discord.ButtonStyles.Danger,
+										},
+									],
 								},
 							],
 						},
@@ -181,11 +189,11 @@ abstract class ModalComposer<FormData, ValidationError extends string> {
 		});
 
 		this.client
-			.reply(submission, {
+			.warning(submission, {
+				flags: Discord.MessageFlags.IsComponentV2,
 				components: [
 					{
 						type: Discord.MessageComponentTypes.Container,
-						accentColor: constants.colours.warning,
 						components: [
 							this.getErrorMessage(submission, { error }) ?? {
 								type: Discord.MessageComponentTypes.TextDisplay,
