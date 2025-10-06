@@ -137,7 +137,7 @@ abstract class ModalComposer<FormData, ValidationError extends string> {
 				locale: submission.locale,
 			});
 			this.client
-				.warning(cancelButtonPress, {
+				.pushback(cancelButtonPress, {
 					flags: Discord.MessageFlags.IsComponentV2,
 					components: [
 						{
@@ -189,7 +189,7 @@ abstract class ModalComposer<FormData, ValidationError extends string> {
 		});
 
 		this.client
-			.warning(submission, {
+			.pushback(submission, {
 				flags: Discord.MessageFlags.IsComponentV2,
 				components: [
 					{
