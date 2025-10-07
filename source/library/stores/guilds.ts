@@ -1,6 +1,6 @@
 import type { Client } from "logos/client";
 import { Collector } from "logos/collectors";
-import { ActionLock } from "logos/helpers/action-lock";
+import { ActionLock } from "logos/action-lock";
 import { Guild } from "logos/models/guild";
 import { Model } from "logos/models/model";
 import type { CommandStore } from "logos/stores/commands";
