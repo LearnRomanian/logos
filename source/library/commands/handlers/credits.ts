@@ -7,16 +7,12 @@ async function handleDisplayCredits(client: Client, interaction: Logos.Interacti
 }
 
 function getTranslationView(client: Client, interaction: Logos.Interaction): Discord.InteractionCallbackData {
-	const fields: Discord.Camelize<Discord.DiscordEmbedField>[] = [];
+	const strings = constants.contexts.credits({ localise: client.localise, locale: interaction.locale });
 
-	const strings = {
-		...constants.contexts.credits({ localise: client.localise, locale: interaction.locale }),
-		...constants.contexts.language({ localise: client.localise, locale: interaction.locale }),
-	};
-	for (const [language, data] of (
-		Object.entries(constants.contributions.translation) as [LocalisationLanguage, Translation][]
-	).sort(([_, a], [__, b]) => b.completion - a.completion)) {
-		const contributorsFormatted = data.contributors
+	function formatTranslation([language, data]: [LocalisationLanguage, Translation]): string {
+		const strings = constants.contexts.language({ localise: client.localise, locale: interaction.locale });
+
+		const formattedContributors = data.contributors
 			.map((contributor) => {
 				if (contributor.link !== undefined) {
 					return `[${contributor.username}](${contributor.link})`;
@@ -24,15 +20,17 @@ function getTranslationView(client: Client, interaction: Logos.Interaction): Dis
 
 				return `${contributor.username}`;
 			})
-			.map((contributor) => `- ${contributor}`)
-			.join("\n");
+			.join(", ");
 
-		fields.push({
-			name: `${data.flag} ${strings.language(language)} (${data.completion * 10}%)`,
-			value: contributorsFormatted,
-			inline: true,
-		});
+		return `### ${data.flag} ${strings.language(language)} (${data.completion * 10}%)\n${formattedContributors}`;
 	}
+
+	const translationsByCompletion = (
+		Object.entries(constants.contributions.translation) as [LocalisationLanguage, Translation][]
+	)
+		.sort(([_, a], [__, b]) => b.completion - a.completion)
+		.map((translation) => formatTranslation(translation))
+		.join("\n");
 
 	return {
 		flags: Discord.MessageFlags.IsComponentV2,
@@ -42,7 +40,7 @@ function getTranslationView(client: Client, interaction: Logos.Interaction): Dis
 				components: [
 					{
 						type: Discord.MessageComponentTypes.TextDisplay,
-						content: `# ${strings.translation}\n\n${fields}`,
+						content: `# ${strings.translation}\n\n${translationsByCompletion}`,
 					},
 				],
 			},

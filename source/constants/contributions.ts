@@ -40,7 +40,7 @@ const contributors = Object.freeze({
 		id: "747900197358665758",
 	},
 	kamelNeon: {
-		username: "KamelNeoN#8068",
+		username: "@the_neon_kamel",
 		id: "311489852824616961",
 	},
 	megaGlaceon: {
