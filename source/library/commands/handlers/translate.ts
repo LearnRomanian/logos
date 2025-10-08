@@ -325,18 +325,21 @@ async function translateText(
 		return;
 	}
 
-	await client.postponeReply(interaction, { visible: interaction.parameters.show });
+	const replyPromise = client.postponeReply(interaction, { visible: interaction.parameters.show });
 
 	let translation: TranslationResult | undefined;
-	for await (const element of Promise.createRace(adapters, (adapter) => adapter.translate({ text, languages }))) {
-		if (element.result === undefined) {
+	for (const adapter of adapters) {
+		const result = await adapter.translate({ text, languages });
+		if (result === undefined) {
 			continue;
 		}
 
-		translation = element.result;
+		translation = result;
 
 		break;
 	}
+
+	await replyPromise;
 
 	if (translation === undefined) {
 		const strings = constants.contexts.failedToTranslate({ localise: client.localise, locale: interaction.locale });
