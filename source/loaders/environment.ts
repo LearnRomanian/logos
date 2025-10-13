@@ -2,6 +2,7 @@ import type pino from "pino";
 
 interface Environment {
 	readonly isDebug?: boolean;
+	readonly isDevelopmentMode?: boolean;
 	readonly discordSecret: string;
 	readonly deeplSecret?: string;
 	readonly rapidApiSecret?: string;
@@ -46,6 +47,7 @@ function loadEnvironment({ log }: { log: pino.Logger }): Environment {
 
 	const environment: Environment = {
 		isDebug: process.env.IS_DEBUG === "true",
+		isDevelopmentMode: process.env.IS_DEVELOPMENT_MODE === "true",
 		discordSecret: process.env.SECRET_DISCORD,
 		deeplSecret: process.env.SECRET_DEEPL,
 		rapidApiSecret: process.env.SECRET_RAPID_API,

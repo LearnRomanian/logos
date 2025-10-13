@@ -34,24 +34,20 @@ import {
 } from "logos/commands/handlers/translate";
 import { handleFindWord, handleFindWordAutocomplete } from "logos/commands/handlers/word";
 
-/**
- * @remarks
- * Commands, command groups and options are ordered alphabetically.
- */
-const commands = Object.freeze({
+const templates = Object.freeze({
 	information: {
 		identifier: "information",
 		type: Discord.ApplicationCommandTypes.ChatInput,
 		defaultMemberPermissions: ["VIEW_CHANNEL"],
-		options: {
-			bot: {
+		options: [
+			{
 				identifier: "bot",
 				type: Discord.ApplicationCommandOptionTypes.SubCommand,
 				handle: handleDisplayBotInformation,
-				options: { show: constants.parameters.show },
-				flags: { isShowable: true },
+				options: [constants.parameters.show],
+				showable: true,
 			},
-		},
+		],
 	},
 	answerMessage: {
 		identifier: "answer.message",
@@ -64,8 +60,8 @@ const commands = Object.freeze({
 		type: Discord.ApplicationCommandTypes.ChatInput,
 		defaultMemberPermissions: ["VIEW_CHANNEL"],
 		handle: handleDisplayCefrGuide,
-		options: { show: constants.parameters.show },
-		flags: { isShowable: true },
+		options: [constants.parameters.show],
+		showable: true,
 	},
 	correctionPartialMessage: {
 		identifier: "correction.options.partial.message",
@@ -90,13 +86,13 @@ const commands = Object.freeze({
 		type: Discord.ApplicationCommandTypes.ChatInput,
 		defaultMemberPermissions: ["VIEW_CHANNEL"],
 		handle: handleRecogniseLanguageChatInput,
-		options: {
-			text: {
+		options: [
+			{
 				identifier: "text",
 				type: Discord.ApplicationCommandOptionTypes.String,
 				required: true,
 			},
-		},
+		],
 	},
 	recogniseMessage: {
 		identifier: "recognise.message",
@@ -109,8 +105,8 @@ const commands = Object.freeze({
 		type: Discord.ApplicationCommandTypes.ChatInput,
 		defaultMemberPermissions: ["VIEW_CHANNEL"],
 		handle: handleDisplayResources,
-		options: { show: constants.parameters.show },
-		flags: { isShowable: true },
+		options: [constants.parameters.show],
+		showable: true,
 	},
 	translate: {
 		identifier: "translate",
@@ -118,32 +114,33 @@ const commands = Object.freeze({
 		defaultMemberPermissions: ["VIEW_CHANNEL"],
 		handle: handleTranslateChatInput,
 		handleAutocomplete: handleTranslateChatInputAutocomplete,
-		options: {
-			text: {
+		options: [
+			{
 				identifier: "text",
 				type: Discord.ApplicationCommandOptionTypes.String,
 				required: true,
 			},
-			to: {
+			{
 				identifier: "to",
 				type: Discord.ApplicationCommandOptionTypes.String,
 				autocomplete: true,
 			},
-			from: {
+			{
 				identifier: "from",
 				type: Discord.ApplicationCommandOptionTypes.String,
 				autocomplete: true,
 			},
-			show: constants.parameters.show,
-		},
-		flags: { hasRateLimit: true, isShowable: true },
+			constants.parameters.show,
+		],
+		rateLimited: true,
+		showable: true,
 	},
 	translateMessage: {
 		identifier: "translate.message",
 		type: Discord.ApplicationCommandTypes.Message,
 		defaultMemberPermissions: ["VIEW_CHANNEL"],
 		handle: handleTranslateMessage,
-		flags: { isShowable: true },
+		showable: true,
 	},
 	...(Object.fromEntries(
 		constants.dictionaries.searchModes.map((searchMode): [DictionarySearchMode, CommandTemplate] => [
@@ -154,24 +151,25 @@ const commands = Object.freeze({
 				defaultMemberPermissions: ["VIEW_CHANNEL"],
 				handle: (client, interaction) => handleFindWord(client, interaction, { searchMode }),
 				handleAutocomplete: handleFindWordAutocomplete,
-				options: {
-					word: {
+				options: [
+					{
 						identifier: "parameters.word",
 						type: Discord.ApplicationCommandOptionTypes.String,
 						required: true,
 					},
-					language: {
+					{
 						identifier: "parameters.language",
 						type: Discord.ApplicationCommandOptionTypes.String,
 						autocomplete: true,
 					},
-					verbose: {
+					{
 						identifier: "parameters.verbose",
 						type: Discord.ApplicationCommandOptionTypes.Boolean,
 					},
-					show: constants.parameters.show,
-				},
-				flags: { hasRateLimit: true, isShowable: true },
+					constants.parameters.show,
+				],
+				rateLimited: true,
+				showable: true,
 			},
 		]),
 	) as Record<DictionarySearchMode, CommandTemplate>),
@@ -181,24 +179,25 @@ const commands = Object.freeze({
 		defaultMemberPermissions: ["VIEW_CHANNEL"],
 		handle: handleFindInContext,
 		handleAutocomplete: handleFindInContextAutocomplete,
-		options: {
-			phrase: {
+		options: [
+			{
 				identifier: "phrase",
 				type: Discord.ApplicationCommandOptionTypes.String,
 				required: true,
 			},
-			language: {
+			{
 				identifier: "language",
 				type: Discord.ApplicationCommandOptionTypes.String,
 				autocomplete: true,
 			},
-			"case-sensitive": {
+			{
 				identifier: "caseSensitive",
 				type: Discord.ApplicationCommandOptionTypes.Boolean,
 			},
-			show: constants.parameters.show,
-		},
-		flags: { hasRateLimit: true, isShowable: true },
+			constants.parameters.show,
+		],
+		rateLimited: true,
+		showable: true,
 	},
 	acknowledgements: {
 		identifier: "acknowledgements",
@@ -216,188 +215,143 @@ const commands = Object.freeze({
 		identifier: "licence",
 		type: Discord.ApplicationCommandTypes.ChatInput,
 		defaultMemberPermissions: ["VIEW_CHANNEL"],
-		options: {
-			detector: {
+		options: [
+			{
 				identifier: "detector",
 				type: Discord.ApplicationCommandOptionTypes.SubCommand,
 				handle: handleDisplayDetectorLicence,
 				handleAutocomplete: handleDisplayDetectorLicenceAutocomplete,
-				options: {
-					dictionary: {
+				options: [
+					{
 						identifier: "detector",
 						type: Discord.ApplicationCommandOptionTypes.String,
 						required: true,
 						autocomplete: true,
 					},
-				},
+				],
 			},
-			dictionary: {
+			{
 				identifier: "dictionary",
 				type: Discord.ApplicationCommandOptionTypes.SubCommand,
 				handle: handleDisplayDictionaryLicence,
 				handleAutocomplete: handleDisplayDictionaryLicenceAutocomplete,
-				options: {
-					dictionary: {
+				options: [
+					{
 						identifier: "dictionary",
 						type: Discord.ApplicationCommandOptionTypes.String,
 						required: true,
 						autocomplete: true,
 					},
-				},
+				],
 			},
-			translator: {
+			{
 				identifier: "translator",
 				type: Discord.ApplicationCommandOptionTypes.SubCommand,
 				handle: handleDisplayTranslatorLicence,
 				handleAutocomplete: handleDisplayTranslatorLicenceAutocomplete,
-				options: {
-					dictionary: {
+				options: [
+					{
 						identifier: "translator",
 						type: Discord.ApplicationCommandOptionTypes.String,
 						required: true,
 						autocomplete: true,
 					},
-				},
+				],
 			},
-		},
+		],
 	},
 	settings: {
 		identifier: "settings",
 		type: Discord.ApplicationCommandTypes.ChatInput,
 		defaultMemberPermissions: ["VIEW_CHANNEL"],
-		options: {
-			language: {
+		options: [
+			{
 				identifier: "language",
 				type: Discord.ApplicationCommandOptionTypes.SubCommandGroup,
-				options: {
-					clear: {
+				options: [
+					{
 						identifier: "clear",
 						type: Discord.ApplicationCommandOptionTypes.SubCommand,
 						handle: handleClearLanguage,
 					},
-					set: {
+					{
 						identifier: "set",
 						type: Discord.ApplicationCommandOptionTypes.SubCommand,
 						handle: handleSetLanguage,
 						handleAutocomplete: handleSetLanguageAutocomplete,
-						options: {
-							language: {
+						options: [
+							{
 								identifier: "language",
 								type: Discord.ApplicationCommandOptionTypes.String,
 								required: true,
 								autocomplete: true,
 							},
-						},
+						],
 					},
-				},
+				],
 			},
-			view: {
+			{
 				identifier: "view",
 				type: Discord.ApplicationCommandOptionTypes.SubCommand,
 				handle: handleDisplaySettings,
 			},
-		},
+		],
 	},
 	maintenance: {
 		identifier: "maintenance",
 		type: Discord.ApplicationCommandTypes.ChatInput,
 		defaultMemberPermissions: ["VIEW_CHANNEL", "ADMINISTRATOR"],
-		options: {
-			reload: {
+		options: [
+			{
 				identifier: "reload",
 				type: Discord.ApplicationCommandOptionTypes.SubCommandGroup,
-				options: {
-					server: {
+				options: [
+					{
 						identifier: "server",
 						type: Discord.ApplicationCommandOptionTypes.SubCommand,
 						handle: handleReloadServer,
 						handleAutocomplete: handleReloadServerAutocomplete,
-						options: {
-							server: {
+						options: [
+							{
 								identifier: "server",
 								type: Discord.ApplicationCommandOptionTypes.String,
 								autocomplete: true,
 							},
-						},
+						],
 					},
-					bot: {
+					{
 						identifier: "bot",
 						type: Discord.ApplicationCommandOptionTypes.SubCommand,
 						handle: handleReloadBot,
 					},
-				},
+				],
 			},
-		},
+		],
 	},
 } satisfies Record<string, CommandTemplate>);
-type CommandTemplates = typeof commands;
-type CommandName = keyof CommandTemplates;
 
-type BuiltCommands = CommandTemplates & Record<CommandName, BuiltCommand>;
+type PropertiesToOmit = "name" | "nameLocalizations" | "description" | "descriptionLocalizations" | "options";
 
-interface OptionFlags {
-	readonly hasRateLimit?: boolean;
-	readonly isShowable?: boolean;
-}
-interface OptionMetadata {
+// ⚠️ Ensure these are kept in sync.
+const propertiesToAdd = ["identifier", "handle", "handleAutocomplete", "rateLimited", "showable", "options"] as const;
+interface PropertiesToAdd {
 	readonly identifier: string;
 	readonly handle?: InteractionHandler;
 	readonly handleAutocomplete?: InteractionHandler;
-	readonly flags?: OptionFlags;
+	readonly rateLimited?: boolean;
+	readonly showable?: boolean;
+	readonly options?: OptionTemplate[];
 }
 
-type Command = Discord.CreateApplicationCommand;
+type Command = Discord.CreateApplicationCommand & Required<Pick<Discord.CreateApplicationCommand, "type">>;
 type Option = Discord.ApplicationCommandOption;
 
-interface CommandBuilderBase<Generic extends { built: boolean }> extends OptionMetadata {
-	readonly type: Discord.ApplicationCommandTypes;
-	readonly defaultMemberPermissions: Discord.PermissionStrings[];
-	readonly options?: Record<string, OptionBuilder<Generic>>;
-}
-type CommandBuilder<Generic extends { built: boolean } = { built: boolean }> = true extends Generic["built"]
-	? CommandBuilderBase<Generic> & {
-			key: string;
-			built: Discord.CreateApplicationCommand;
-		}
-	: CommandBuilderBase<Generic>;
+type CommandTemplate = Omit<Command, PropertiesToOmit> &
+	PropertiesToAdd & {
+		readonly type: Discord.ApplicationCommandTypes;
+	};
+type OptionTemplate = Omit<Option, PropertiesToOmit> & PropertiesToAdd;
 
-interface OptionBuilderBase<Generic extends { built: boolean }> extends OptionMetadata {
-	readonly type: Discord.ApplicationCommandOptionTypes;
-	readonly required?: boolean;
-	readonly choices?: Discord.ApplicationCommandOptionChoice[];
-	readonly channelTypes?: Discord.ChannelTypes[];
-	readonly minimumValue?: number;
-	readonly maximumValue?: number;
-	readonly minimumLength?: number;
-	readonly maximumLength?: number;
-	readonly autocomplete?: boolean;
-	readonly options?: Record<string, OptionBuilder<Generic>>;
-}
-type OptionBuilder<Generic extends { built: boolean } = { built: boolean }> = true extends Generic["built"]
-	? OptionBuilderBase<Generic> & {
-			key: string;
-			built: Discord.ApplicationCommandOption;
-		}
-	: OptionBuilderBase<Generic>;
-
-type CommandTemplate = CommandBuilder<{ built: false }>;
-type OptionTemplate = OptionBuilder<{ built: false }>;
-
-type BuiltCommand = CommandBuilder<{ built: true }>;
-type BuiltOption = OptionBuilder<{ built: true }>;
-
-export default commands;
-export type {
-	CommandBuilder,
-	OptionBuilder,
-	BuiltCommands,
-	BuiltCommand,
-	BuiltOption,
-	Command,
-	CommandName,
-	CommandTemplates,
-	CommandTemplate,
-	OptionMetadata,
-	Option,
-	OptionTemplate,
-};
+export default templates;
+export { propertiesToAdd };
+export type { Command, Option, CommandTemplate, OptionTemplate };

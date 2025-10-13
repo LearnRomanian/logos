@@ -1,4 +1,4 @@
-import { isAutocomplete, isSubcommand, isSubcommandGroup } from "logos:constants/interactions";
+import { isAutocompleteInteraction, isSubcommand, isSubcommandGroup } from "logos:constants/interactions";
 import { type LearningLanguage, getLearningLocaleByLanguage } from "logos:constants/languages/learning";
 import { getDiscordLanguageByLocale, getLocalisationLocaleByLanguage } from "logos:constants/languages/localisation";
 import type { DesiredProperties, DesiredPropertiesBehaviour } from "logos:constants/properties";
@@ -318,7 +318,7 @@ class InteractionCollector<
 		const featureLanguage = guildDocument.languages.feature;
 
 		// If the user has configured a custom locale, use the user's preferred locale.
-		if (!isAutocomplete(interaction) && userDocument.preferredLanguage !== undefined) {
+		if (!isAutocompleteInteraction(interaction) && userDocument.preferredLanguage !== undefined) {
 			const language = userDocument.preferredLanguage;
 			const locale = getLocalisationLocaleByLanguage(language);
 			return {

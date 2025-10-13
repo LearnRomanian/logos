@@ -1,4 +1,4 @@
-import type { OptionTemplate } from "logos/commands/commands";
+import type { OptionTemplate } from "logos/commands/templates";
 
 export default Object.freeze({
 	user: {

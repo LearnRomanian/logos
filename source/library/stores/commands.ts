@@ -1,42 +1,24 @@
-import { isAutocomplete } from "logos:constants/interactions";
-import { getDiscordLanguageByLocale } from "logos:constants/languages/localisation";
+import { isContextCommand, isSlashCommand } from "logos:constants/commands";
+import { isAutocompleteInteraction } from "logos:constants/interactions";
 import { isDefined } from "logos:core/utilities";
 import type { Client } from "logos/client";
-import type {
-	BuiltCommand,
-	BuiltCommands,
-	Command,
-	CommandBuilder,
-	CommandName,
-	CommandTemplate,
-	CommandTemplates,
-	Option,
-	OptionBuilder,
-	OptionMetadata,
-	OptionTemplate,
-} from "logos/commands/commands";
 import type { InteractionHandler } from "logos/commands/handlers/handler";
-import type { Guild } from "logos/models/guild";
+import templates, { propertiesToAdd } from "logos/commands/templates";
+import type { Command, CommandTemplate, Option, OptionTemplate } from "logos/commands/templates";
 import type { DescriptionLocalisations, LocalisationStore, NameLocalisations } from "logos/stores/localisations";
 import type pino from "pino";
 
 interface RateLimit {
 	nextAllowedUsageTimestamp: number;
 }
-type LocalisedNamesWithMetadata = [names: NameLocalisations, metadata: OptionMetadata];
-type BuildResult<Object extends Command | Option> = {
-	key: string;
-	built: Object;
-	namesWithMetadata: LocalisedNamesWithMetadata[];
-};
 class CommandStore {
 	readonly log: pino.Logger;
-	readonly commands: BuiltCommands;
+	readonly commands: Command[];
 
 	readonly #client: Client;
 	readonly #collection: {
 		readonly showable: Set<string>;
-		readonly withRateLimit: Set<string>;
+		readonly rateLimited: Set<string>;
 	};
 	// The keys are member IDs, the values are command usage timestamps mapped by command IDs.
 	readonly #lastCommandUseTimestamps: Map<bigint, Map<bigint, number[]>>;
@@ -44,20 +26,19 @@ class CommandStore {
 		readonly execute: Map<string, InteractionHandler>;
 		readonly autocomplete: Map<string, InteractionHandler>;
 	};
-	readonly #defaultCommands: BuiltCommand[];
 
 	constructor(
 		client: Client,
 		{
 			commands,
 			showable,
-			withRateLimit,
+			rateLimited,
 			executeHandlers,
 			autocompleteHandlers,
 		}: {
-			commands: BuiltCommands;
+			commands: Command[];
 			showable: Set<string>;
-			withRateLimit: Set<string>;
+			rateLimited: Set<string>;
 			executeHandlers: Map<string, InteractionHandler>;
 			autocompleteHandlers: Map<string, InteractionHandler>;
 		},
@@ -66,120 +47,38 @@ class CommandStore {
 		this.commands = commands;
 
 		this.#client = client;
-		this.#collection = { showable, withRateLimit };
+		this.#collection = { showable, rateLimited };
 		this.#lastCommandUseTimestamps = new Map();
 		this.#handlers = { execute: executeHandlers, autocomplete: autocompleteHandlers };
-		this.#defaultCommands = [
-			this.commands.information,
-			this.commands.acknowledgements,
-			this.commands.credits,
-			this.commands.licence,
-			this.commands.settings,
-			this.commands.recognise,
-			this.commands.recogniseMessage,
-			this.commands.maintenance,
-		].filter(isDefined);
 	}
 
-	static create(
-		client: Client,
-		{
-			localisations,
-			templates,
-		}: {
-			localisations: LocalisationStore;
-			templates: CommandTemplates;
-		},
-	): CommandStore {
-		const log = client.log.child({ name: "CommandStore" });
-
-		// Build commands from templates.
-		const commands: Partial<BuiltCommands> = {};
-		const namesWithMetadata: LocalisedNamesWithMetadata[] = [];
-		for (const [identifier, template] of Object.entries(templates) as [CommandName, CommandTemplate][]) {
-			const result = CommandStore.build({ localisations, template });
-			if (result === undefined) {
-				continue;
-			}
-
-			const { key, built, namesWithMetadata: namesWithMetadataPart } = result;
-
-			const builtCommand = template as BuiltCommand;
-
-			builtCommand.key = key;
-			builtCommand.built = built;
-
-			// @ts-ignore: This is fine for now.
-			commands[identifier as CommandName] = builtCommand;
-			namesWithMetadata.push(...namesWithMetadataPart);
-		}
-
-		// Check for duplicates.
-		const nameBuffers: Partial<Record<Discord.Locales, Set<string>>> = {};
-		const commandMetadataByDisplayName = new Map<string, OptionMetadata>();
-		for (const [nameLocalisations, metadata] of namesWithMetadata) {
-			const { name, nameLocalizations } = nameLocalisations;
-
-			if (commandMetadataByDisplayName.has(name)) {
-				log.warn(`Duplicate command "${name}". Skipping addition...`);
-				continue;
-			}
-
-			if (nameLocalizations === undefined) {
-				commandMetadataByDisplayName.set(name, metadata);
-				continue;
-			}
-
-			for (const [locale, name] of Object.entries(nameLocalizations) as [Discord.Locales, string][]) {
-				if (!(locale in nameBuffers)) {
-					nameBuffers[locale] = new Set([name]);
-					continue;
-				}
-
-				const buffer = nameBuffers[locale]!;
-				if (buffer.has(name)) {
-					const language = getDiscordLanguageByLocale(locale)!;
-					log.warn(`Duplicate command "${name}" in ${language}. Skipping addition...`);
-					delete nameLocalizations[locale];
-					continue;
-				}
-
-				buffer.add(locale);
-			}
-
-			commandMetadataByDisplayName.set(name, metadata);
-		}
-
-		// Declare commands by their flags.
+	static create(client: Client, { localisations }: { localisations: LocalisationStore }): CommandStore {
+		const commands: Command[] = [];
 		const showable = new Set<string>();
-		const withRateLimit = new Set<string>();
-		for (const [nameLocalisations, metadata] of namesWithMetadata) {
-			if (metadata.flags?.isShowable ?? false) {
-				showable.add(nameLocalisations.name);
-			}
-
-			if (metadata.flags?.hasRateLimit ?? false) {
-				withRateLimit.add(nameLocalisations.name);
-			}
-		}
-
-		// Register handlers.
+		const rateLimited = new Set<string>();
 		const executeHandlers = new Map<string, InteractionHandler>();
 		const autocompleteHandlers = new Map<string, InteractionHandler>();
-		for (const [nameLocalisations, metadata] of namesWithMetadata) {
-			if (metadata.handle !== undefined) {
-				executeHandlers.set(nameLocalisations.name, metadata.handle);
+		for (const template of Object.values(templates) as CommandTemplate[]) {
+			const command = CommandStore.build({ localisations, template });
+			if (command === undefined) {
+				continue;
 			}
 
-			if (metadata.handleAutocomplete !== undefined) {
-				autocompleteHandlers.set(nameLocalisations.name, metadata.handleAutocomplete);
+			commands.push(command);
+
+			if (template.handle !== undefined) {
+				executeHandlers.set(command.name, template.handle);
+			}
+
+			if (template.handleAutocomplete !== undefined) {
+				autocompleteHandlers.set(command.name, template.handleAutocomplete);
 			}
 		}
 
 		return new CommandStore(client, {
-			commands: commands as BuiltCommands,
+			commands,
 			showable,
-			withRateLimit,
+			rateLimited,
 			executeHandlers,
 			autocompleteHandlers,
 		});
@@ -189,9 +88,9 @@ class CommandStore {
 		localisations: LocalisationStore;
 		template: CommandTemplate;
 		keyPrefix?: string;
-	}): BuildResult<Command> | undefined;
+	}): Command | undefined;
 	static build(_: { localisations: LocalisationStore; template: OptionTemplate; keyPrefix?: string }):
-		| BuildResult<Option>
+		| Option
 		| undefined;
 	static build({
 		localisations,
@@ -201,7 +100,7 @@ class CommandStore {
 		localisations: LocalisationStore;
 		template: CommandTemplate | OptionTemplate;
 		keyPrefix?: string;
-	}): BuildResult<Command | Option> | undefined {
+	}): Command | Option | undefined {
 		let key: string;
 		if (keyPrefix !== undefined) {
 			key = `${keyPrefix}.options.${template.identifier}`;
@@ -219,99 +118,25 @@ class CommandStore {
 			return undefined;
 		}
 
-		if (template.options === undefined || Object.keys(template.options).length === 0) {
-			const localisedNamesWithMetadata: LocalisedNamesWithMetadata = [nameLocalisations, template];
+		const options = template.options
+			?.map((option) => CommandStore.build({ localisations, template: option, keyPrefix: key }))
+			.filter(isDefined);
 
-			let built: Discord.CreateApplicationCommand | Discord.ApplicationCommandOption;
-			if (keyPrefix !== undefined) {
-				built = CommandStore.buildOption({
-					template: template as OptionTemplate,
-					nameLocalisations,
-					descriptionLocalisations,
-				});
-			} else {
-				built = CommandStore.buildCommand({
-					template: template as CommandTemplate,
-					nameLocalisations,
-					descriptionLocalisations,
-				});
-			}
-
-			return { key, built, namesWithMetadata: [localisedNamesWithMetadata] };
-		}
-
-		const namesWithMetadata: LocalisedNamesWithMetadata[] = [];
-		const optionTemplates = Object.values(template.options) as OptionBuilder[];
-		for (const template of optionTemplates) {
-			const result = CommandStore.build({ localisations, template, keyPrefix: key });
-			if (result === undefined) {
-				continue;
-			}
-
-			const { key: builtKey, built, namesWithMetadata: namesWithMetadataPart } = result;
-
-			template.key = builtKey;
-			template.built = built;
-
-			if (
-				!(
-					template.type === Discord.ApplicationCommandOptionTypes.SubCommand ||
-					template.type === Discord.ApplicationCommandOptionTypes.SubCommandGroup
-				)
-			) {
-				continue;
-			}
-
-			// Take the localised name object and replicate it, only prefixed with the option localised names.
-			//
-			// In practice, this process turns the following example:
-			// [
-			//   { name: "open", nameLocalizations: { "pl": "otwórz", "ro": "deschide" } },
-			//   { name: "close", nameLocalizations: { "pl": "zamknij", "ro": "închide" } },
-			// ]
-			// Into:
-			// [
-			//   { name: "channel open", nameLocalizations: { "pl": "kanał otwórz", "ro": "canal deschide" } },
-			//   { name: "channel close", nameLocalizations: { "pl": "kanał zamknij", "ro": "canal închide" } },
-			// ]
-			for (const [optionNameLocalisations, metadata] of namesWithMetadataPart) {
-				const commandNamesLocalised: Partial<Record<Discord.Locales, string>> = {};
-				for (const [locale, string] of Object.entries(commandNamesLocalised) as [Discord.Locales, string][]) {
-					const localisedName =
-						optionNameLocalisations.nameLocalizations?.[locale] ?? optionNameLocalisations.name;
-					commandNamesLocalised[locale] = `${string} ${localisedName}`;
-				}
-
-				namesWithMetadata.push([
-					{
-						name: `${nameLocalisations.name} ${optionNameLocalisations.name}`,
-						nameLocalizations: commandNamesLocalised,
-					},
-					metadata,
-				]);
-			}
-		}
-
-		namesWithMetadata.push([nameLocalisations, template]);
-
-		let built: Discord.CreateApplicationCommand | Discord.ApplicationCommandOption;
 		if (keyPrefix !== undefined) {
-			built = CommandStore.buildOption({
+			return CommandStore.buildOption({
 				template: template as OptionTemplate,
 				nameLocalisations,
 				descriptionLocalisations,
-				options: optionTemplates.map((option) => option.built),
-			});
-		} else {
-			built = CommandStore.buildCommand({
-				template: template as CommandTemplate,
-				nameLocalisations,
-				descriptionLocalisations,
-				options: optionTemplates.map((option) => option.built),
+				options,
 			});
 		}
 
-		return { key, built, namesWithMetadata };
+		return CommandStore.buildCommand({
+			template: template as CommandTemplate,
+			nameLocalisations,
+			descriptionLocalisations,
+			options,
+		});
 	}
 
 	static buildCommand({
@@ -325,22 +150,30 @@ class CommandStore {
 		descriptionLocalisations: DescriptionLocalisations;
 		options?: Option[];
 	}): Command {
-		if (template.type !== Discord.ApplicationCommandTypes.Message) {
+		const copy = { ...template };
+		for (const property of propertiesToAdd) {
+			delete copy[property];
+		}
+
+		if (isContextCommand(template.type)) {
+			return {
+				...nameLocalisations,
+				...copy,
+				type: template.type,
+			} satisfies Discord.CreateContextApplicationCommand;
+		}
+
+		if (isSlashCommand(template.type)) {
 			return {
 				...nameLocalisations,
 				...descriptionLocalisations,
+				...copy,
 				type: template.type,
-				defaultMemberPermissions: template.defaultMemberPermissions,
 				options,
-			};
+			} satisfies Discord.CreateSlashApplicationCommand;
 		}
 
-		return {
-			...nameLocalisations,
-			type: template.type,
-			defaultMemberPermissions: template.defaultMemberPermissions,
-			options,
-		};
+		throw new Error(`Could not resolve any types in command '${template.identifier}'`);
 	}
 
 	static buildOption({
@@ -354,32 +187,49 @@ class CommandStore {
 		descriptionLocalisations: DescriptionLocalisations;
 		options?: Option[];
 	}): Option {
+		const copy = { ...template };
+		for (const property of propertiesToAdd) {
+			delete copy[property];
+		}
+
 		return {
 			...nameLocalisations,
 			...descriptionLocalisations,
-			type: template.type,
-			required: template.required,
-			channelTypes: template.channelTypes,
-			minValue: template.minimumValue,
-			maxValue: template.maximumValue,
-			minLength: template.minimumLength,
-			maxLength: template.maximumLength,
-			autocomplete: template.autocomplete,
-			choices: template.choices,
+			...copy,
 			options,
 		};
 	}
 
-	async registerGuildCommands({ guildId, guildDocument }: { guildId: bigint; guildDocument: Guild }): Promise<void> {
-		this.#client.bot.helpers
-			.upsertGuildApplicationCommands(guildId, this.getEnabledCommands(guildDocument))
+	async setup(): Promise<void> {
+		this.log.info("Setting up the commands store...");
+
+		if (!this.#client.environment.isDevelopmentMode) {
+			await this.registerGlobalCommands();
+		}
+
+		this.log.info("Commands store set up.");
+	}
+
+	async registerGlobalCommands(): Promise<void> {
+		await this.#client.bot.helpers
+			.upsertGlobalApplicationCommands(this.commands)
+			.catch((error) => this.log.warn(error, "Failed to upsert global commands."));
+	}
+
+	async registerGuildCommands({ guildId }: { guildId: bigint }): Promise<void> {
+		if (this.#client.environment.isDevelopmentMode) {
+			return;
+		}
+
+		await this.#client.bot.helpers
+			.upsertGuildApplicationCommands(guildId, this.commands)
 			.catch((error) =>
 				this.log.warn(error, `Failed to upsert commands on ${this.#client.diagnostics.guild(guildId)}.`),
 			);
 	}
 
 	getHandler(interaction: Logos.Interaction): InteractionHandler | undefined {
-		if (isAutocomplete(interaction)) {
+		if (isAutocompleteInteraction(interaction)) {
 			return this.#handlers.autocomplete.get(interaction.commandName);
 		}
 
@@ -390,53 +240,8 @@ class CommandStore {
 		return this.#collection.showable.has(interaction.commandName);
 	}
 
-	hasRateLimit(interaction: Logos.Interaction) {
-		return this.#collection.withRateLimit.has(interaction.commandName);
-	}
-
-	getEnabledCommands(guildDocument: Guild): Command[] {
-		const commands: CommandBuilder[] = [];
-
-		if (guildDocument.hasEnabled("answers")) {
-			commands.push(this.commands.answerMessage);
-		}
-
-		if (guildDocument.hasEnabled("corrections")) {
-			commands.push(this.commands.correctionFullMessage, this.commands.correctionPartialMessage);
-		}
-
-		if (guildDocument.hasEnabled("cefr")) {
-			commands.push(this.commands.cefr);
-		}
-
-		if (guildDocument.hasEnabled("game") && this.#client.volatile) {
-			commands.push(this.commands.game);
-		}
-
-		if (guildDocument.hasEnabled("resources")) {
-			commands.push(this.commands.resources);
-		}
-
-		if (guildDocument.hasEnabled("translate")) {
-			commands.push(this.commands.translate, this.commands.translateMessage);
-		}
-
-		if (guildDocument.hasEnabled("word")) {
-			commands.push(this.commands.word);
-			commands.push(this.commands.meaning);
-			commands.push(this.commands.expressions);
-			commands.push(this.commands.inflection);
-			commands.push(this.commands.etymology);
-			commands.push(this.commands.pronunciation);
-			commands.push(this.commands.relations);
-			commands.push(this.commands.examples);
-		}
-
-		if (guildDocument.hasEnabled("context")) {
-			commands.push(this.commands.context);
-		}
-
-		return [...this.#defaultCommands.map((command) => command.built), ...commands.map((command) => command.built)];
+	isRateLimited(interaction: Logos.Interaction) {
+		return this.#collection.rateLimited.has(interaction.commandName);
 	}
 
 	#getLastCommandUseTimestamps({

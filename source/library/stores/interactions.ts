@@ -268,7 +268,7 @@ class InteractionStore {
 
 		if (
 			interaction.type !== Discord.InteractionTypes.ApplicationCommandAutocomplete &&
-			this.#commands.hasRateLimit(interaction)
+			this.#commands.isRateLimited(interaction)
 		) {
 			const rateLimit = this.#commands.getRateLimit(interaction, { executedAt });
 			if (rateLimit !== undefined) {

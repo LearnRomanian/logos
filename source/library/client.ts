@@ -1,6 +1,5 @@
 import type { Environment } from "logos:core/loaders/environment";
 import { Collector, type InteractionCollector } from "logos/collectors";
-import commands from "logos/commands/commands";
 import { DiscordConnection } from "logos/connection";
 import { Diagnostics } from "logos/diagnostics";
 import { AdapterStore } from "logos/stores/adapters";
@@ -183,10 +182,7 @@ class Client {
 		this.diagnostics = new Diagnostics(this);
 
 		this.localisations = new LocalisationStore({ log, localisations });
-		this.#commands = CommandStore.create(this, {
-			localisations: this.localisations,
-			templates: commands,
-		});
+		this.#commands = CommandStore.create(this, { localisations: this.localisations });
 		this.interactions = new InteractionStore(this, { commands: this.#commands });
 		this.#cache = new CacheStore({ log });
 		this.database = DatabaseStore.create({ log, environment, cache: this.#cache });
@@ -236,6 +232,7 @@ class Client {
 		await this.volatile?.setup();
 		await this.database.setup();
 		await this.services.setup();
+		await this.#commands.setup();
 		await this.guilds.setup();
 		await this.interactions.setup();
 		await this.#setupCollectors();
