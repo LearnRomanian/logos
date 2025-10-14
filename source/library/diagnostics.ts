@@ -92,11 +92,9 @@ class Diagnostics {
 			channel = channelOrId;
 		}
 
-		let guildFormatted: string;
+		let guildFormatted: string | undefined;
 		if (channel.guildId !== undefined) {
 			guildFormatted = this.guild(channel.guildId);
-		} else {
-			guildFormatted = "unknown guild";
 		}
 
 		let channelTypeFormatted: string;
@@ -144,19 +142,27 @@ class Diagnostics {
 		}
 
 		if (channel.name === undefined) {
+			if (guildFormatted === undefined) {
+				return `unnamed ${channelTypeFormatted} (ID ${channel.id})`;
+			}
+
 			return `unnamed ${channelTypeFormatted} (ID ${channel.id}) @ ${guildFormatted}`;
+		}
+
+		if (guildFormatted === undefined) {
+			return `${channelTypeFormatted} "${channel.name}" (ID ${channel.id})`;
 		}
 
 		return `${channelTypeFormatted} "${channel.name}" (ID ${channel.id}) @ ${guildFormatted}`;
 	}
 
 	interaction(interaction: InteractionLike): string {
-		let memberFormatted: string;
+		let memberFormatted: string | undefined;
 		if (interaction.member !== undefined) {
 			memberFormatted = this.member(interaction.member);
-		} else {
-			memberFormatted = "unknown member";
 		}
+
+		const userFormatted = this.user(interaction.user);
 
 		let interactionTypeFormatted: string;
 		switch (interaction.type) {
@@ -199,7 +205,7 @@ class Diagnostics {
 			}
 		}
 
-		return `${interactionTypeFormatted} (ID ${interaction.id}) from ${memberFormatted}`;
+		return `${interactionTypeFormatted} (ID ${interaction.id}) from ${memberFormatted ?? userFormatted}`;
 	}
 }
 
