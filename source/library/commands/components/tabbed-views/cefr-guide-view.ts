@@ -11,19 +11,19 @@ interface TabGroups {
 }
 
 class CefrGuideView extends TabbedView<{ groups: TabGroups }> {
-	readonly #guildDocument: Guild;
+	readonly #guildDocument?: Guild;
 
-	get #configuration(): NonNullable<Guild["features"]["cefr"]> {
-		return this.#guildDocument.feature("cefr");
+	get #configuration(): Guild["features"]["cefr"] {
+		return this.#guildDocument?.feature("cefr");
 	}
 
 	get #examplesEnabled(): boolean {
-		return this.#configuration.examples !== undefined;
+		return this.#configuration?.examples !== undefined;
 	}
 
 	constructor(
 		client: Client,
-		{ interaction, guildDocument }: { interaction: Logos.Interaction; guildDocument: Guild },
+		{ interaction, guildDocument }: { interaction: Logos.Interaction; guildDocument?: Guild },
 	) {
 		super(client, { interaction, tabs: { bracket: "a", mode: "guide" }, showable: true });
 
@@ -123,7 +123,7 @@ class CefrGuideView extends TabbedView<{ groups: TabGroups }> {
 		interaction: Logos.Interaction,
 		{ bracket }: { bracket: Bracket },
 	): Discord.Camelize<Discord.DiscordEmbed> {
-		const examples = this.#configuration.examples!;
+		const examples = this.#configuration!.examples!;
 
 		switch (bracket) {
 			case "a": {
