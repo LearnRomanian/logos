@@ -182,7 +182,7 @@ class Client {
 		this.diagnostics = new Diagnostics(this);
 
 		this.localisations = new LocalisationStore({ log, localisations });
-		this.#commands = CommandStore.create(this, { localisations: this.localisations });
+		this.#commands = new CommandStore(this, { localisations: this.localisations });
 		this.interactions = new InteractionStore(this, { commands: this.#commands });
 		this.#cache = new CacheStore({ log });
 		this.database = DatabaseStore.create({ log, environment, cache: this.#cache });

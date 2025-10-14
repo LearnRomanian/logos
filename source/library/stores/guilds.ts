@@ -70,7 +70,7 @@ class GuildStore {
 
 		const guildDocument = await Guild.getOrCreate(this.#client, { guildId: guild.id.toString() });
 		await this.#services.startForGuild({ guildId: guild.id, guildDocument });
-		await this.#commands.registerGuildCommands({ guildId: guild.id, guildDocument });
+		await this.#commands.registerGuildCommands({ guildId: guild.id });
 	}
 
 	async #setupGuildForFirstTime(guild: Discord.Guild | Logos.Guild): Promise<void> {

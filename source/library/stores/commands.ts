@@ -16,6 +16,7 @@ class CommandStore {
 	readonly commands: Command[];
 
 	readonly #client: Client;
+	readonly #localisations: LocalisationStore;
 	readonly #collection: {
 		readonly showable: Set<string>;
 		readonly rateLimited: Set<string>;
@@ -27,119 +28,93 @@ class CommandStore {
 		readonly autocomplete: Map<string, InteractionHandler>;
 	};
 
-	constructor(
-		client: Client,
-		{
-			commands,
-			showable,
-			rateLimited,
-			executeHandlers,
-			autocompleteHandlers,
-		}: {
-			commands: Command[];
-			showable: Set<string>;
-			rateLimited: Set<string>;
-			executeHandlers: Map<string, InteractionHandler>;
-			autocompleteHandlers: Map<string, InteractionHandler>;
-		},
-	) {
+	constructor(client: Client, { localisations }: { localisations: LocalisationStore }) {
 		this.log = client.log.child({ name: "CommandStore" });
-		this.commands = commands;
+		this.commands = [];
 
 		this.#client = client;
-		this.#collection = { showable, rateLimited };
+		this.#localisations = localisations;
+		this.#collection = { showable: new Set(), rateLimited: new Set() };
 		this.#lastCommandUseTimestamps = new Map();
-		this.#handlers = { execute: executeHandlers, autocomplete: autocompleteHandlers };
+		this.#handlers = { execute: new Map(), autocomplete: new Map() };
 	}
 
-	static create(client: Client, { localisations }: { localisations: LocalisationStore }): CommandStore {
-		const commands: Command[] = [];
-		const showable = new Set<string>();
-		const rateLimited = new Set<string>();
-		const executeHandlers = new Map<string, InteractionHandler>();
-		const autocompleteHandlers = new Map<string, InteractionHandler>();
+	loadCommands(): void {
 		for (const template of Object.values(templates) as CommandTemplate[]) {
-			const command = CommandStore.build({ localisations, template });
-			if (command === undefined) {
-				continue;
-			}
-
-			commands.push(command);
-
-			if (template.handle !== undefined) {
-				executeHandlers.set(command.name, template.handle);
-			}
-
-			if (template.handleAutocomplete !== undefined) {
-				autocompleteHandlers.set(command.name, template.handleAutocomplete);
-			}
+			this.load({ template });
 		}
-
-		return new CommandStore(client, {
-			commands,
-			showable,
-			rateLimited,
-			executeHandlers,
-			autocompleteHandlers,
-		});
 	}
 
-	static build(_: {
-		localisations: LocalisationStore;
-		template: CommandTemplate;
-		keyPrefix?: string;
-	}): Command | undefined;
-	static build(_: { localisations: LocalisationStore; template: OptionTemplate; keyPrefix?: string }):
-		| Option
-		| undefined;
-	static build({
-		localisations,
+	load(_: { template: CommandTemplate; prefixes?: { key: string; commandName: string } }): Command | undefined;
+	load(_: { template: OptionTemplate; prefixes?: { key: string; commandName: string } }): Option | undefined;
+	load({
 		template,
-		keyPrefix,
-	}: {
-		localisations: LocalisationStore;
-		template: CommandTemplate | OptionTemplate;
-		keyPrefix?: string;
-	}): Command | Option | undefined {
+		prefixes,
+	}: { template: CommandTemplate | OptionTemplate; prefixes?: { key: string; commandName: string } }):
+		| Command
+		| Option
+		| undefined {
 		let key: string;
-		if (keyPrefix !== undefined) {
-			key = `${keyPrefix}.options.${template.identifier}`;
+		if (prefixes !== undefined) {
+			key = `${prefixes.key}.options.${template.identifier}`;
 		} else {
 			key = template.identifier;
 		}
 
-		const nameLocalisations = localisations.buildNameLocalisations({ key });
-		if (nameLocalisations === undefined) {
+		const nameLocalisations = this.#localisations.buildNameLocalisations({ key });
+		const descriptionLocalisations = this.#localisations.buildDescriptionLocalisations({ key });
+		if (nameLocalisations === undefined || descriptionLocalisations === undefined) {
 			return undefined;
 		}
 
-		const descriptionLocalisations = localisations.buildDescriptionLocalisations({ key });
-		if (descriptionLocalisations === undefined) {
-			return undefined;
+		let commandName: string;
+		if (prefixes !== undefined) {
+			commandName = `${prefixes.commandName} ${nameLocalisations.name}`;
+		} else {
+			commandName = nameLocalisations.name;
 		}
 
-		const options = template.options
-			?.map((option) => CommandStore.build({ localisations, template: option, keyPrefix: key }))
+		const options = (template.options ?? [])
+			.map((option) => this.load({ template: option, prefixes: { key, commandName } }))
 			.filter(isDefined);
 
-		if (keyPrefix !== undefined) {
-			return CommandStore.buildOption({
+		let result: Command | Option;
+		if (prefixes !== undefined) {
+			result = this.buildOption({
 				template: template as OptionTemplate,
+				nameLocalisations,
+				descriptionLocalisations,
+				options,
+			});
+		} else {
+			result = this.buildCommand({
+				template: template as CommandTemplate,
 				nameLocalisations,
 				descriptionLocalisations,
 				options,
 			});
 		}
 
-		return CommandStore.buildCommand({
-			template: template as CommandTemplate,
-			nameLocalisations,
-			descriptionLocalisations,
-			options,
-		});
+		if (template.showable ?? false) {
+			this.#collection.showable.add(commandName);
+		}
+
+		if (template.rateLimited ?? false) {
+			this.#collection.rateLimited.add(commandName);
+		}
+
+		if (template.handle !== undefined) {
+			this.#handlers.execute.set(commandName, template.handle);
+		}
+
+		if (template.handleAutocomplete !== undefined) {
+			this.#handlers.autocomplete.set(commandName, template.handleAutocomplete);
+		}
+
+		return result;
 	}
 
-	static buildCommand({
+	buildCommand({
 		template,
 		nameLocalisations,
 		descriptionLocalisations,
@@ -176,7 +151,7 @@ class CommandStore {
 		throw new Error(`Could not resolve any types in command '${template.identifier}'`);
 	}
 
-	static buildOption({
+	buildOption({
 		template,
 		nameLocalisations,
 		descriptionLocalisations,
@@ -202,6 +177,8 @@ class CommandStore {
 
 	async setup(): Promise<void> {
 		this.log.info("Setting up the commands store...");
+
+		this.loadCommands();
 
 		if (!this.#client.environment.isDevelopmentMode) {
 			await this.registerGlobalCommands();
