@@ -36,6 +36,10 @@ async function handleReloadServer(
 			return;
 		}
 	} else {
+		if (interaction.guildId === undefined) {
+			return;
+		}
+
 		guildId = interaction.guildId;
 	}
 
