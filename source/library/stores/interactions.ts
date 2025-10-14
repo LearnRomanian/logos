@@ -229,7 +229,7 @@ class InteractionStore {
 	}
 
 	async teardown(): Promise<void> {
-		this.#interactions.close();
+		await this.#interactions.close();
 	}
 
 	async handleInteraction(interaction: Logos.Interaction): Promise<void> {
@@ -373,6 +373,10 @@ class InteractionStore {
 		this.#replies.set(interaction.token, { ephemeral: !visible });
 
 		if (interaction.parameters["@repeat"]) {
+			if (interaction.channelId === undefined) {
+				return;
+			}
+
 			const strings = constants.contexts.thinking({
 				localise: this.#client.localise,
 				locale: interaction.guildLocale,
@@ -448,6 +452,10 @@ class InteractionStore {
 		this.#replies.set(interaction.token, { ephemeral: !visible });
 
 		if (interaction.parameters["@repeat"]) {
+			if (interaction.channelId === undefined) {
+				return;
+			}
+
 			const message = await this.#client.bot.helpers
 				.sendMessage(interaction.channelId, {
 					messageReference: {
@@ -490,6 +498,10 @@ class InteractionStore {
 		const data = getInteractionCallbackData(embedOrData);
 
 		if (interaction.parameters["@repeat"]) {
+			if (interaction.channelId === undefined) {
+				return;
+			}
+
 			const messageId = this.#messages.get(interaction.token)!;
 
 			await this.#client.bot.helpers.editMessage(interaction.channelId, messageId, data).catch((error) => {
@@ -511,6 +523,10 @@ class InteractionStore {
 
 	async deleteReply(interaction: Logos.Interaction): Promise<void> {
 		if (interaction.parameters["@repeat"]) {
+			if (interaction.channelId === undefined) {
+				return;
+			}
+
 			const messageId = this.#messages.get(interaction.token)!;
 
 			this.#messages.delete(interaction.token);
