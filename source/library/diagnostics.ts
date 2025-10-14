@@ -54,7 +54,7 @@ class Diagnostics {
 		let role: RoleLike;
 		if (isId(roleOrId)) {
 			if (!this.#client.entities.roles.has(BigInt(roleOrId))) {
-				return `uncached role (ID ${roleOrId})`;
+				return `unknown role (ID ${roleOrId})`;
 			}
 
 			role = this.#client.entities.roles.get(BigInt(roleOrId))!;
@@ -69,7 +69,7 @@ class Diagnostics {
 		let guild: GuildLike;
 		if (isId(guildOrId)) {
 			if (!this.#client.entities.guilds.has(BigInt(guildOrId))) {
-				return `uncached guild (ID ${guildOrId})`;
+				return `unknown guild (ID ${guildOrId})`;
 			}
 
 			guild = this.#client.entities.guilds.get(BigInt(guildOrId))!;
@@ -84,7 +84,7 @@ class Diagnostics {
 		let channel: ChannelLike;
 		if (isId(channelOrId)) {
 			if (!this.#client.entities.channels.has(BigInt(channelOrId))) {
-				return `uncached channel (ID ${channelOrId})`;
+				return `unknown channel (ID ${channelOrId})`;
 			}
 
 			channel = this.#client.entities.channels.get(BigInt(channelOrId))!;
