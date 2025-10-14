@@ -23,7 +23,7 @@ class GameViewComponent {
 	readonly #guesses: InteractionCollector<[index: string]>;
 	readonly #skips: InteractionCollector;
 	sentenceSelection!: SentenceSelection;
-	guildStatisticsDocument!: GuildStatistics;
+	guildStatisticsDocument?: GuildStatistics;
 	userDocument!: User;
 	embedColour: number;
 	sessionScore: number;
@@ -41,24 +41,28 @@ class GameViewComponent {
 
 	async #setup(): Promise<void> {
 		this.sentenceSelection = await this.getSentenceSelection({ learningLocale: this.#interaction.learningLocale });
-		[this.guildStatisticsDocument, this.userDocument] = await Promise.all([
-			GuildStatistics.getOrCreate(this.#client, {
-				guildId: this.#interaction.guildId.toString(),
-			}),
-			User.getOrCreate(this.#client, { userId: this.#interaction.user.id.toString() }),
-		]);
 
-		await this.guildStatisticsDocument.update(this.#client, () => {
-			this.guildStatisticsDocument.registerSession({
-				game: "pickMissingWord",
-				learningLocale: this.#interaction.learningLocale,
-				isUnique:
-					this.userDocument.getGameScores({
-						game: "pickMissingWord",
-						learningLocale: this.#interaction.learningLocale,
-					}) === undefined,
+		if (this.#interaction.guildId !== undefined) {
+			this.guildStatisticsDocument = await GuildStatistics.getOrCreate(this.#client, {
+				guildId: this.#interaction.guildId.toString(),
 			});
-		});
+		}
+
+		this.userDocument = await User.getOrCreate(this.#client, { userId: this.#interaction.user.id.toString() });
+
+		if (this.guildStatisticsDocument !== undefined) {
+			await this.guildStatisticsDocument.update(this.#client, () => {
+				this.guildStatisticsDocument!.registerSession({
+					game: "pickMissingWord",
+					learningLocale: this.#interaction.learningLocale,
+					isUnique:
+						this.userDocument.getGameScores({
+							game: "pickMissingWord",
+							learningLocale: this.#interaction.learningLocale,
+						}) === undefined,
+				});
+			});
+		}
 
 		await this.userDocument.update(this.#client, () => {
 			this.userDocument.registerSession({
@@ -190,12 +194,14 @@ class GameViewComponent {
 		const pick = this.sentenceSelection.allPicks.find((pick) => pick[0].toString() === buttonPress.metadata[1]);
 		const isCorrect = pick === this.sentenceSelection.correctPick;
 
-		await this.guildStatisticsDocument.update(this.#client, () => {
-			this.guildStatisticsDocument.incrementScore({
-				game: "pickMissingWord",
-				learningLocale: this.#interaction.learningLocale,
+		if (this.guildStatisticsDocument !== undefined) {
+			await this.guildStatisticsDocument.update(this.#client, () => {
+				this.guildStatisticsDocument!.incrementScore({
+					game: "pickMissingWord",
+					learningLocale: this.#interaction.learningLocale,
+				});
 			});
-		});
+		}
 
 		await this.userDocument.update(this.#client, () => {
 			this.userDocument.incrementScore({
