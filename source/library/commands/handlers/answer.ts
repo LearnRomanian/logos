@@ -4,11 +4,6 @@ import { ConfirmationPrompt } from "logos/commands/components/confirmation-promp
 import { AnswerComposer, type AnswerFormData } from "logos/commands/components/modal-composers/answer-composer";
 
 async function handleAnswer(client: Client, interaction: Logos.Interaction): Promise<void> {
-	const member = client.entities.members.get(interaction.guildId)?.get(interaction.user.id);
-	if (member === undefined) {
-		return;
-	}
-
 	const message = interaction.data?.resolved?.messages?.array()?.at(0);
 	if (message === undefined) {
 		return;
