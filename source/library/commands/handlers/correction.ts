@@ -23,7 +23,10 @@ async function handleMakeCorrection(
 	interaction: Logos.Interaction,
 	{ mode }: { mode: CorrectionMode },
 ): Promise<void> {
-	const guildDocument = await Guild.getOrCreate(client, { guildId: interaction.guildId.toString() });
+	let guildDocument: Guild | undefined;
+	if (interaction.guildId !== undefined) {
+		guildDocument = await Guild.getOrCreate(client, { guildId: interaction.guildId.toString() });
+	}
 
 	const message = interaction.data?.resolved?.messages?.array()?.at(0);
 	if (message === undefined) {
@@ -44,20 +47,22 @@ async function handleMakeCorrection(
 		return;
 	}
 
-	const correctedMember = client.entities.members.get(interaction.guildId)?.get(message.author.id);
-	if (correctedMember === undefined) {
-		return;
-	}
+	if (guildDocument !== undefined) {
+		const correctedMember = client.entities.members.get(BigInt(guildDocument.guildId))?.get(message.author.id);
+		if (correctedMember === undefined) {
+			return;
+		}
 
-	const doNotCorrectMeRoleIds = guildDocument.feature("corrections").doNotCorrectRoleIds;
-	if (correctedMember.roles.some((roleId) => doNotCorrectMeRoleIds.includes(roleId.toString()))) {
-		const strings = constants.contexts.userDoesNotWantCorrections({
-			localise: client.localise,
-			locale: interaction.locale,
-		});
-		client.warning(interaction, { title: strings.title, description: strings.description }).ignore();
+		const doNotCorrectMeRoleIds = guildDocument.feature("corrections").doNotCorrectRoleIds;
+		if (correctedMember.roles.some((roleId) => doNotCorrectMeRoleIds.includes(roleId.toString()))) {
+			const strings = constants.contexts.userDoesNotWantCorrections({
+				localise: client.localise,
+				locale: interaction.locale,
+			});
+			client.warning(interaction, { title: strings.title, description: strings.description }).ignore();
 
-		return;
+			return;
+		}
 	}
 
 	if (message.content.length > constants.MAXIMUM_CORRECTION_MESSAGE_LENGTH) {
