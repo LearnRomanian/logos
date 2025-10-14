@@ -34,16 +34,6 @@ async function handleFindWord(
 	const learningLanguage = interaction.parameters.language ?? interaction.learningLanguage;
 	searchMode = searchMode ?? constants.SEARCH_MODE;
 
-	const guildId = interaction.guildId;
-	if (guildId === undefined) {
-		return;
-	}
-
-	const guild = client.entities.guilds.get(guildId);
-	if (guild === undefined) {
-		return;
-	}
-
 	const dictionaries = client.adapters.dictionaries.getAdapters({ learningLanguage });
 	if (dictionaries === undefined) {
 		const strings = constants.contexts.noDictionaryAdapters({
@@ -60,7 +50,7 @@ async function handleFindWord(
 	client.log.info(
 		`Looking up the word '${interaction.parameters.word}' from ${
 			dictionaries.length
-		} dictionaries as requested by ${client.diagnostics.user(interaction.user)} on ${guild.name}...`,
+		} dictionaries as requested by ${interaction.member !== undefined ? client.diagnostics.member(interaction.member) : client.diagnostics.user(interaction.user)}...`,
 	);
 
 	const unclassifiedEntries: DictionaryEntry[] = [];
