@@ -6,7 +6,7 @@ import type {
 	SelectedDesiredProperties,
 } from "logos:constants/properties";
 import type { SlowmodeLevel } from "logos:constants/slowmode";
-import type { PromiseOr, WithRequired } from "logos:core/utilities";
+import type { PromiseOr } from "logos:core/utilities";
 import type { EntryRequest } from "logos/models/entry-request";
 import type { Praise } from "logos/models/praise";
 import type { Report } from "logos/models/report";
@@ -101,10 +101,7 @@ declare global {
 		type Interaction<
 			Metadata extends string[] = any,
 			Parameters extends Record<string, string | number | boolean | undefined> = any,
-		> = WithRequired<
-			Omit<RawInteraction, "locale" | "guildLocale" | "respond" | "edit" | "deferEdit" | "defer" | "delete">,
-			"guildId" | "channelId"
-		> &
+		> = Omit<RawInteraction, "locale" | "guildLocale" | "respond" | "edit" | "deferEdit" | "defer" | "delete"> &
 			InteractionLocaleData & {
 				commandName: string;
 				metadata: [customId: string, ...data: Metadata];
