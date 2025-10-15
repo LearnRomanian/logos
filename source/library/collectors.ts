@@ -289,8 +289,12 @@ class InteractionCollector<
 	async #getLocaleData(
 		interaction: Interaction,
 	): Promise<Omit<Logos.InteractionLocaleData, "displayLocale" | "displayLanguage">> {
-		const member = this.#client.entities.members.get(interaction.guildId!)?.get(interaction.user.id);
-		if (member === undefined) {
+		let member: Logos.Member | undefined;
+		if (interaction.guildId !== undefined) {
+			member = this.#client.entities.members.get(interaction.guildId)?.get(interaction.user.id);
+		}
+
+		if (interaction.guildId === undefined || member === undefined) {
 			return {
 				locale: constants.defaults.LOCALISATION_LOCALE,
 				language: constants.defaults.LOCALISATION_LANGUAGE,
@@ -304,7 +308,7 @@ class InteractionCollector<
 
 		const [userDocument, guildDocument] = await Promise.all([
 			User.getOrCreate(this.#client, { userId: interaction.user.id.toString() }),
-			Guild.getOrCreate(this.#client, { guildId: interaction.guildId!.toString() }),
+			Guild.getOrCreate(this.#client, { guildId: interaction.guildId.toString() }),
 		]);
 
 		const targetLanguage = guildDocument.languages.target;
