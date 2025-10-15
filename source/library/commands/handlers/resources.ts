@@ -3,6 +3,10 @@ import { Guild } from "logos/models/guild";
 
 /** Displays a message with information on where to find the resources for a given language. */
 async function handleDisplayResources(client: Client, interaction: Logos.Interaction): Promise<void> {
+	if (interaction.guildId === undefined) {
+		return;
+	}
+
 	const guildDocument = await Guild.getOrCreate(client, { guildId: interaction.guildId.toString() });
 	const configuration = guildDocument.feature("resources");
 
