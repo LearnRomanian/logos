@@ -1,5 +1,6 @@
 import acknowledgements from "logos:constants/acknowledgements";
 import colours from "logos:constants/colours";
+import commands from "logos:constants/commands";
 import components from "logos:constants/components";
 import contexts from "logos:constants/contexts";
 import contributions from "logos:constants/contributions";
@@ -66,6 +67,7 @@ export default Object.freeze({
 	...constants,
 	acknowledgements,
 	colours,
+	commands,
 	components,
 	contexts,
 	contributions,

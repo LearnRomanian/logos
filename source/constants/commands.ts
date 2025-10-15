@@ -8,4 +8,11 @@ function isContextCommand(
 	return [Discord.ApplicationCommandTypes.User, Discord.ApplicationCommandTypes.Message].includes(type);
 }
 
+export default Object.freeze({
+	contexts: [
+		Discord.DiscordInteractionContextType.Guild,
+		Discord.DiscordInteractionContextType.BotDm,
+		Discord.DiscordInteractionContextType.PrivateChannel,
+	] satisfies Discord.DiscordInteractionContextType[],
+} as const);
 export { isSlashCommand, isContextCommand };

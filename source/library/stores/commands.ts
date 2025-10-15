@@ -134,6 +134,7 @@ class CommandStore {
 			return {
 				...nameLocalisations,
 				...copy,
+				contexts: copy.contexts ?? constants.commands.contexts,
 				type: template.type,
 			} satisfies Discord.CreateContextApplicationCommand;
 		}
@@ -143,6 +144,7 @@ class CommandStore {
 				...nameLocalisations,
 				...descriptionLocalisations,
 				...copy,
+				contexts: copy.contexts ?? constants.commands.contexts,
 				type: template.type,
 				options,
 			} satisfies Discord.CreateSlashApplicationCommand;
