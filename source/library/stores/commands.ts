@@ -180,14 +180,16 @@ class CommandStore {
 
 		this.loadCommands();
 
-		if (!this.#client.environment.isDevelopmentMode) {
-			await this.registerGlobalCommands();
-		}
+		await this.registerGlobalCommands();
 
 		this.log.info("Commands store set up.");
 	}
 
 	async registerGlobalCommands(): Promise<void> {
+		if (!this.#client.environment.isDevelopmentMode) {
+			return;
+		}
+
 		await this.#client.bot.helpers
 			.upsertGlobalApplicationCommands(this.commands)
 			.catch((error) => this.log.warn(error, "Failed to upsert global commands."));
