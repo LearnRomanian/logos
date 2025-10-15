@@ -222,16 +222,21 @@ class CommandStore {
 	}
 
 	#getLastCommandUseTimestamps({
-		memberId,
+		id,
 		commandId,
 		executedAt,
 		intervalMilliseconds,
-	}: { memberId: bigint; commandId: bigint; executedAt: number; intervalMilliseconds: number }): number[] {
-		if (!this.#lastCommandUseTimestamps.has(memberId)) {
+	}: {
+		id: bigint;
+		commandId: bigint;
+		executedAt: number;
+		intervalMilliseconds: number;
+	}): number[] {
+		if (!this.#lastCommandUseTimestamps.has(id)) {
 			return [];
 		}
 
-		const lastCommandUseTimestamps = this.#lastCommandUseTimestamps.get(memberId)!;
+		const lastCommandUseTimestamps = this.#lastCommandUseTimestamps.get(id)!;
 		if (!lastCommandUseTimestamps.has(commandId)) {
 			return [];
 		}
@@ -247,10 +252,15 @@ class CommandStore {
 			return undefined;
 		}
 
-		const memberId = this.#client.bot.transformers.snowflake(`${interaction.user.id}${interaction.guildId}`);
+		let memberId: bigint | undefined;
+		if (interaction.guildId !== undefined) {
+			memberId = this.#client.bot.transformers.snowflake(`${interaction.user.id}${interaction.guildId}`);
+		}
+
+		const id = memberId ?? interaction.user.id;
 
 		const timestamps = this.#getLastCommandUseTimestamps({
-			memberId,
+			id,
 			commandId,
 			executedAt,
 			intervalMilliseconds: constants.COMMAND_RATE_LIMIT_WITHIN,
@@ -267,15 +277,15 @@ class CommandStore {
 			return { nextAllowedUsageTimestamp };
 		}
 
-		const lastCommandUseTimestampsForMember = this.#lastCommandUseTimestamps.get(memberId);
-		if (lastCommandUseTimestampsForMember === undefined) {
-			this.#lastCommandUseTimestamps.set(memberId, new Map([[commandId, [executedAt]]]));
+		const lastCommandUseTimestamps = this.#lastCommandUseTimestamps.get(id);
+		if (lastCommandUseTimestamps === undefined) {
+			this.#lastCommandUseTimestamps.set(id, new Map([[commandId, [executedAt]]]));
 			return undefined;
 		}
 
-		const lastTimestamps = lastCommandUseTimestampsForMember.get(commandId);
+		const lastTimestamps = lastCommandUseTimestamps.get(commandId);
 		if (lastTimestamps === undefined) {
-			lastCommandUseTimestampsForMember.set(commandId, [executedAt]);
+			lastCommandUseTimestamps.set(commandId, [executedAt]);
 			return undefined;
 		}
 
