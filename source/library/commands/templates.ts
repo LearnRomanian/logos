@@ -38,7 +38,7 @@ const templates = Object.freeze({
 	information: {
 		identifier: "information",
 		type: Discord.ApplicationCommandTypes.ChatInput,
-		defaultMemberPermissions: ["VIEW_CHANNEL"],
+		contexts: [Discord.DiscordInteractionContextType.BotDm, Discord.DiscordInteractionContextType.PrivateChannel],
 		options: [
 			{
 				identifier: "bot",
@@ -52,13 +52,12 @@ const templates = Object.freeze({
 	answerMessage: {
 		identifier: "answer.message",
 		type: Discord.ApplicationCommandTypes.Message,
-		defaultMemberPermissions: ["VIEW_CHANNEL"],
 		handle: handleAnswer,
+		contexts: [Discord.DiscordInteractionContextType.Guild, Discord.DiscordInteractionContextType.PrivateChannel],
 	},
 	cefr: {
 		identifier: "cefr",
 		type: Discord.ApplicationCommandTypes.ChatInput,
-		defaultMemberPermissions: ["VIEW_CHANNEL"],
 		handle: handleDisplayCefrGuide,
 		options: [constants.parameters.show],
 		showable: true,
@@ -66,25 +65,23 @@ const templates = Object.freeze({
 	correctionPartialMessage: {
 		identifier: "correction.options.partial.message",
 		type: Discord.ApplicationCommandTypes.Message,
-		defaultMemberPermissions: ["VIEW_CHANNEL"],
 		handle: handleMakePartialCorrection,
+		contexts: [Discord.DiscordInteractionContextType.Guild, Discord.DiscordInteractionContextType.PrivateChannel],
 	},
 	correctionFullMessage: {
 		identifier: "correction.options.full.message",
 		type: Discord.ApplicationCommandTypes.Message,
-		defaultMemberPermissions: ["VIEW_CHANNEL"],
 		handle: handleMakeFullCorrection,
+		contexts: [Discord.DiscordInteractionContextType.Guild, Discord.DiscordInteractionContextType.PrivateChannel],
 	},
 	game: {
 		identifier: "game",
 		type: Discord.ApplicationCommandTypes.ChatInput,
-		defaultMemberPermissions: ["VIEW_CHANNEL"],
 		handle: handleStartGame,
 	},
 	recognise: {
 		identifier: "recognise",
 		type: Discord.ApplicationCommandTypes.ChatInput,
-		defaultMemberPermissions: ["VIEW_CHANNEL"],
 		handle: handleRecogniseLanguageChatInput,
 		options: [
 			{
@@ -97,21 +94,19 @@ const templates = Object.freeze({
 	recogniseMessage: {
 		identifier: "recognise.message",
 		type: Discord.ApplicationCommandTypes.Message,
-		defaultMemberPermissions: ["VIEW_CHANNEL"],
 		handle: handleRecogniseLanguageMessage,
 	},
 	resources: {
 		identifier: "resources",
 		type: Discord.ApplicationCommandTypes.ChatInput,
-		defaultMemberPermissions: ["VIEW_CHANNEL"],
 		handle: handleDisplayResources,
 		options: [constants.parameters.show],
+		contexts: [Discord.DiscordInteractionContextType.Guild],
 		showable: true,
 	},
 	translate: {
 		identifier: "translate",
 		type: Discord.ApplicationCommandTypes.ChatInput,
-		defaultMemberPermissions: ["VIEW_CHANNEL"],
 		handle: handleTranslateChatInput,
 		handleAutocomplete: handleTranslateChatInputAutocomplete,
 		options: [
@@ -138,7 +133,6 @@ const templates = Object.freeze({
 	translateMessage: {
 		identifier: "translate.message",
 		type: Discord.ApplicationCommandTypes.Message,
-		defaultMemberPermissions: ["VIEW_CHANNEL"],
 		handle: handleTranslateMessage,
 		showable: true,
 	},
@@ -176,7 +170,6 @@ const templates = Object.freeze({
 	context: {
 		identifier: "context",
 		type: Discord.ApplicationCommandTypes.ChatInput,
-		defaultMemberPermissions: ["VIEW_CHANNEL"],
 		handle: handleFindInContext,
 		handleAutocomplete: handleFindInContextAutocomplete,
 		options: [
@@ -203,18 +196,18 @@ const templates = Object.freeze({
 		identifier: "acknowledgements",
 		type: Discord.ApplicationCommandTypes.ChatInput,
 		handle: handleDisplayAcknowledgements,
-		defaultMemberPermissions: ["VIEW_CHANNEL"],
+		contexts: [Discord.DiscordInteractionContextType.BotDm],
 	},
 	credits: {
 		identifier: "credits",
 		type: Discord.ApplicationCommandTypes.ChatInput,
 		handle: handleDisplayCredits,
-		defaultMemberPermissions: ["VIEW_CHANNEL"],
+		contexts: [Discord.DiscordInteractionContextType.BotDm],
 	},
 	licence: {
 		identifier: "licence",
 		type: Discord.ApplicationCommandTypes.ChatInput,
-		defaultMemberPermissions: ["VIEW_CHANNEL"],
+		contexts: [Discord.DiscordInteractionContextType.BotDm],
 		options: [
 			{
 				identifier: "detector",
@@ -263,7 +256,7 @@ const templates = Object.freeze({
 	settings: {
 		identifier: "settings",
 		type: Discord.ApplicationCommandTypes.ChatInput,
-		defaultMemberPermissions: ["VIEW_CHANNEL"],
+		contexts: [Discord.DiscordInteractionContextType.BotDm],
 		options: [
 			{
 				identifier: "language",
@@ -300,7 +293,7 @@ const templates = Object.freeze({
 	maintenance: {
 		identifier: "maintenance",
 		type: Discord.ApplicationCommandTypes.ChatInput,
-		defaultMemberPermissions: ["VIEW_CHANNEL", "ADMINISTRATOR"],
+		contexts: [Discord.DiscordInteractionContextType.BotDm],
 		options: [
 			{
 				identifier: "reload",

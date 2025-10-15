@@ -14,5 +14,6 @@ export default Object.freeze({
 		Discord.DiscordInteractionContextType.BotDm,
 		Discord.DiscordInteractionContextType.PrivateChannel,
 	] satisfies Discord.DiscordInteractionContextType[],
+	defaultMemberPermissions: ["VIEW_CHANNEL"] satisfies Discord.PermissionStrings[],
 } as const);
 export { isSlashCommand, isContextCommand };

@@ -135,6 +135,7 @@ class CommandStore {
 				...nameLocalisations,
 				...copy,
 				contexts: copy.contexts ?? constants.commands.contexts,
+				defaultMemberPermissions: copy.defaultMemberPermissions ?? constants.commands.defaultMemberPermissions,
 				type: template.type,
 			} satisfies Discord.CreateContextApplicationCommand;
 		}
@@ -145,6 +146,7 @@ class CommandStore {
 				...descriptionLocalisations,
 				...copy,
 				contexts: copy.contexts ?? constants.commands.contexts,
+				defaultMemberPermissions: copy.defaultMemberPermissions ?? constants.commands.defaultMemberPermissions,
 				type: template.type,
 				options,
 			} satisfies Discord.CreateSlashApplicationCommand;
