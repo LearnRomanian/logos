@@ -123,7 +123,6 @@ You must also include, in your app or site, wherever you provide attributions or
 		),
 		ravendb: mit("Copyright (c) 2017 Hibernating Rhinos LTD"),
 		"rethinkdb-ts": apache("Copyright (c) Authors of rethinkdb-ts"),
-		shoukaku: mit("Copyright (c) 2023 Deivu (Saya)"),
 		tinyld: mit("Copyright (c) 2021 Komodo"),
 		"wiktionary-scraper": mit('Copyright (c) 2023 Dorian "vxern" Oszczęda'),
 		youtubei: mit("Copyright (c) 2020 Vincent Jonathan"),
