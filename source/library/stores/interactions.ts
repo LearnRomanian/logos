@@ -25,7 +25,7 @@ class InteractionStore {
 	readonly #commands: CommandStore;
 	readonly #registeredInteractions: Map<bigint, Logos.Interaction>;
 	readonly #replies: Map</* token: */ string, ReplyData>;
-	readonly #messages: Map</* token: */ string, bigint>;
+	readonly #messages: Map</* token: */ string, { messageId: bigint; timeout: ReturnType<typeof setTimeout> }>;
 
 	readonly #interactions: InteractionCollector;
 
@@ -334,13 +334,16 @@ class InteractionStore {
 	}
 
 	#registerMessage(interaction: Logos.Interaction, { messageId }: { messageId: bigint }): void {
-		setTimeout(() => this.#unregisterMessage(interaction), constants.discord.INTERACTION_TOKEN_EXPIRY);
+		const timeout = setTimeout(() => this.#unregisterMessage(interaction), constants.discord.INTERACTION_TOKEN_EXPIRY);
 
-		this.#messages.set(interaction.token, messageId);
+		this.#messages.set(interaction.token, { messageId, timeout });
 	}
 
 	#unregisterMessage(interaction: Logos.Interaction): void {
-		// TODO(vxern): The timeout to unregister the message should be cleared immediately.
+		const entry = this.#messages.get(interaction.token);
+		if (entry !== undefined) {
+			clearTimeout(entry.timeout);
+		}
 
 		this.#messages.delete(interaction.token);
 	}
@@ -490,7 +493,11 @@ class InteractionStore {
 		const data = getInteractionCallbackData(embedOrData);
 
 		if (interaction.parameters["@repeat"]) {
-			const messageId = this.#messages.get(interaction.token)!;
+			if (interaction.channelId === undefined) {
+				return;
+			}
+
+			const { messageId } = this.#messages.get(interaction.token)!;
 
 			await this.#client.bot.helpers.editMessage(interaction.channelId, messageId, data).catch((error) => {
 				this.log.error(error, "Failed to edit message reply made to repeated interaction.");
@@ -511,9 +518,13 @@ class InteractionStore {
 
 	async deleteReply(interaction: Logos.Interaction): Promise<void> {
 		if (interaction.parameters["@repeat"]) {
-			const messageId = this.#messages.get(interaction.token)!;
+			if (interaction.channelId === undefined) {
+				return;
+			}
 
-			this.#messages.delete(interaction.token);
+			const { messageId } = this.#messages.get(interaction.token)!;
+
+			this.#unregisterMessage(interaction);
 
 			await this.#client.bot.helpers.deleteMessage(interaction.channelId, messageId).catch((error) => {
 				this.log.error(error, "Failed to delete message reply made to repeated interaction.");
