@@ -1,6 +1,6 @@
+import { ActionLock } from "logos/action-lock";
 import type { Client } from "logos/client";
 import { Collector } from "logos/collectors";
-import { ActionLock } from "logos/action-lock";
 import { Guild } from "logos/models/guild";
 import { Model } from "logos/models/model";
 import type { CommandStore } from "logos/stores/commands";
@@ -32,7 +32,7 @@ class GuildStore {
 		this.log.info("Setting up the guild store...");
 
 		this.#guildCreateCollector.onCollect((guild) => this.#setupGuild(guild));
-		this.#guildDeleteCollector.onCollect((guildId, _) => this.#teardownGuild({ guildId }));
+		this.#guildDeleteCollector.onCollect(({ id }, _) => this.#teardownGuild({ guildId: id }));
 
 		await this.#client.registerCollector("guildCreate", this.#guildCreateCollector);
 		await this.#client.registerCollector("guildDelete", this.#guildDeleteCollector);
@@ -91,12 +91,10 @@ class GuildStore {
 				return [];
 			});
 		for (const member of members) {
-			this.#client.bot.transformers.member(
-				this.#client.bot,
-				member as unknown as Discord.DiscordMember,
-				guild.id,
-				member.user.id,
-			);
+			this.#client.bot.transformers.member(this.#client.bot, member as unknown as Discord.DiscordMember, {
+				guildId: guild.id,
+				userId: member.user.id,
+			});
 		}
 
 		this.log.info(`Fetched ~${guild.memberCount} members of ${this.#client.diagnostics.guild(guild)}.`);

@@ -40,7 +40,7 @@ class DiscordConnection {
 					}
 
 					// The `shardId` is not necessary here.
-					bot.events.messageUpdate?.(bot.transformers.message(bot, { message, shardId: 0 }));
+					bot.events.messageUpdate?.(bot.transformers.message(bot, message, { shardId: 0 }));
 				},
 			},
 			desiredProperties: constants.properties as unknown as DesiredProperties,

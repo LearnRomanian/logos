@@ -334,7 +334,10 @@ class InteractionStore {
 	}
 
 	#registerMessage(interaction: Logos.Interaction, { messageId }: { messageId: bigint }): void {
-		const timeout = setTimeout(() => this.#unregisterMessage(interaction), constants.discord.INTERACTION_TOKEN_EXPIRY);
+		const timeout = setTimeout(
+			() => this.#unregisterMessage(interaction),
+			constants.discord.INTERACTION_TOKEN_EXPIRY,
+		);
 
 		this.#messages.set(interaction.token, { messageId, timeout });
 	}

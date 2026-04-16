@@ -48,7 +48,7 @@ class CouchDBAdapter extends DatabaseAdapter {
 
 		this.#server = nano({
 			url,
-			requestDefaults: { headers: { "User-Agent": constants.USER_AGENT } },
+			headers: { "User-Agent": constants.USER_AGENT },
 		});
 		this.#databaseName = database;
 	}

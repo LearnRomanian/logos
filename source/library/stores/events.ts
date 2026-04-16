@@ -46,7 +46,7 @@ class EventStore {
 			guildBanAdd: (user, guildId) => this.collectEvent(guildId, "guildBanAdd", { args: [user, guildId] }),
 			guildBanRemove: (user, guildId) => this.collectEvent(guildId, "guildBanRemove", { args: [user, guildId] }),
 			guildCreate: (guild) => this.collectEvent(guild.id, "guildCreate", { args: [guild] }),
-			guildDelete: (id, shardId) => this.collectEvent(id, "guildDelete", { args: [id, shardId] }),
+			guildDelete: (data, shardId) => this.collectEvent(data.id, "guildDelete", { args: [data, shardId] }),
 			guildUpdate: (guild) => this.collectEvent(guild.id, "guildUpdate", { args: [guild] }),
 			roleCreate: (role) => this.collectEvent(role.guildId, "roleCreate", { args: [role] }),
 			roleDelete: (role) => this.collectEvent(role.guildId, "roleDelete", { args: [role] }),
